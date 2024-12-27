@@ -1,4 +1,4 @@
-<div class="flex justify-between bg-lB p-5 border-b-2 border-black sticky top-0 z-50">
+<div class="flex justify-between bg-lB p-5 border-b-2 border-black sticky top-0 z-30">
 
     {{-- Navbar Label --}}
     @if (session()->has('admin'))
@@ -24,11 +24,8 @@
                 class="{{ $judul == 'Daftar Menu' || $judul == 'Tambah Menu' || $judul == 'Ubah Menu' ? 'bg-dY' : 'bg-mY shadow-xl' }} text-black font-poppins border border-black p-2 rounded-md hover:bg-dY">Daftar
                 Menu</a>
             <a href="{{ route('admin.daftar-transaksi') }}"
-                class="{{ $judul == 'Daftar Transaksi' ? 'bg-dY' : 'bg-mY shadow-xl' }} text-black font-poppins border border-black p-2 rounded-md hover:bg-dY">Daftar
+                class="{{ $judul == 'Daftar Transaksi' || $judul == 'Detail Transaksi' ? 'bg-dY' : 'bg-mY shadow-xl' }} text-black font-poppins border border-black p-2 rounded-md hover:bg-dY">Daftar
                 Transaksi</a>
-            <a href="{{ route('admin.daftar-admin') }}"
-                class="{{ $judul == 'Daftar Admin' || $judul == 'Tambah Admin' || $judul == 'Ubah Admin' ? 'bg-dY' : 'bg-mY shadow-xl' }} text-black font-poppins border border-black p-2 rounded-md hover:bg-dY">Daftar
-                Admin</a>
             <a href="{{ route('admin.daftar-cashier') }}"
                 class="{{ $judul == 'Daftar Kasir' || $judul == 'Tambah Kasir' || $judul == 'Ubah Kasir' ? 'bg-dY' : 'bg-mY shadow-xl' }} text-black font-poppins border border-black p-2 rounded-md hover:bg-dY">Daftar
                 Kasir</a>
@@ -45,11 +42,15 @@
 
     {{-- Navbar Logout --}}
     @if (session()->has('admin') || session()->has('cashier') || session()->has('chef'))
-        <a href="{{ route('logout') }}"
-            class="text-black bg-mY border border-black px-2 font-poppins bg-midyellow rounded-md shadow-md hover:bg-dY flex justify-center items-center gap-2">
-            Logout
-            <i class="fas fa-sign-out"></i>
-        </a>
+        <form action="{{ route('logout-pegawai') }}" method="POST">
+            @csrf
+
+            <button type="submit"
+                class="text-black w-full h-full bg-mY border border-black px-2 font-poppins bg-midyellow rounded-md shadow-md hover:bg-dY flex justify-center items-center gap-2">
+                Logout
+                <i class="fas fa-sign-out"></i>
+            </button>
+        </form>
     @elseif (session()->has('customer'))
         {{-- DROPDOWN --}}
         <div class="relative inline-block text-left font-poppins">
@@ -83,13 +84,13 @@
                 class="hidden absolute right-0 w-28 rounded-br-md rounded-bl-md text-white border border-black shadow-2xl bg-dY">
                 <div class="py-1">
 
-                    @if ($judul == 'Menu' || $judul == 'Pesanan')
+                    @if ($judul == 'Menu')
                         <a href="{{ route('keranjang') }}"
                             class="px-3 py-2 flex justify-center items-center text-sm border-b border-black hover:bg-mY hover:text-black">
                             <i class="fas fa-cart-shopping text-sm mr-1"></i>
                             Keranjang
                         </a>
-                    @elseif ($judul == 'Keranjang')
+                    @elseif ($judul == 'Keranjang' || $judul == 'Pesanan')
                         <a href="{{ route('menu') }}"
                             class="px-3 py-2 flex justify-center items-center text-sm border-b border-black hover:bg-mY hover:text-black">
                             <i class="fas fa-utensils text-sm mr-1"></i>
@@ -98,10 +99,10 @@
                     @endif
 
                     @if ($judul == 'Pesanan')
-                        <a href="{{ route('menu') }}"
+                        <a href="{{ route('keranjang') }}"
                             class="px-3 py-2 flex justify-center items-center text-sm border-b border-black hover:bg-mY hover:text-black">
-                            <i class="fas fa-utensils text-sm mr-1"></i>
-                            Menu
+                            <i class="fas fa-cart-shopping text-sm mr-1"></i>
+                            Keranjang
                         </a>
                     @elseif ($judul == 'Menu' || $judul == 'Keranjang')
                         <a href="{{ route('pesanan') }}"
@@ -111,12 +112,15 @@
                         </a>
                     @endif
 
-                    <a href="{{ route('logout') }}"
-                        class="px-4 py-2 flex justify-center items-center text-sm hover:bg-mY hover:text-black">
-                        <i class="fas fa-sign-out text-sm mr-1"></i>
-                        Logout
-                    </a>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
 
+                        <button type="submit"
+                            class="px-4 w-full h-full py-2 flex justify-center items-center text-sm hover:bg-mY hover:text-black">
+                            <i class="fas fa-sign-out text-sm mr-1"></i>
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -32,7 +32,7 @@
                 <tbody>
                     @foreach ($customers as $index => $customer)
                         <tr class="odd:bg-gray-200 hover:bg-gray-300">
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ $offset + $index + 1 }}</td>
                             <td class="px-2">{{ $customer->name }}</td>
                             <td class="px-2">{{ $customer->username }}</td>
                             <td class="px-2">{{ $customer->email }}</td>
@@ -42,7 +42,8 @@
                                     <i class="fas fa-pen"></i>
                                     Ubah
                                 </a>
-                                <form action="{{ route('admin.hapus-customer', [$customer->customer_id]) }}" method="POST">
+                                <form action="{{ route('admin.hapus-customer', [$customer->customer_id]) }}"
+                                    method="POST">
                                     @csrf
                                     @method('delete')
 
@@ -57,8 +58,13 @@
                         </tr>
                     @endforeach
                 </tbody>
-
             </table>
+            <div class="mt-3">
+                @if ($offset > -1)
+                    {{-- pagination --}}
+                    {{ $customers->links() }}
+                @endif
+            </div>
         </div>
     </div>
 

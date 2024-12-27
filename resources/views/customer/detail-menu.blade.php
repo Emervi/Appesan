@@ -15,7 +15,7 @@
             <div class="mb-2">
                 <img src="{{ asset('images/' . $data->image) }}" alt="Foto menu" class="w-full h-60 object-cover rounded">
             </div>
-            <h2 class="font-semibold text-2xl">{{ $data->formatted_price }}</h2>
+            <h2 class="font-semibold text-2xl">Rp. {{ number_format($data->price, 0, ',', '.') }}</h2>
             <p class="text-base mb-3">Kategori: {{ $data->category }}</p>
             <p class="text-lg">{{ $data->description }}</p>
         </div>

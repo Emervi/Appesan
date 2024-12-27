@@ -15,33 +15,38 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function tampilanRegister() {
+    public function tampilanRegister()
+    {
         return view('auth.register');
     }
 
-    public function tampilanLogin() {
+    public function tampilanLogin()
+    {
         return view('auth.login');
     }
 
-    public function tampilanLoginPegawai() {
+    public function tampilanLoginPegawai()
+    {
         return view('auth.login-pegawai');
     }
 
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
 
         $request->validate([
             'name' => ['required', 'string'],
             'username' => ['required', 'string', 'min:3'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:customers,email'],
             'password' => ['required', 'min:8'],
         ], [
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama wajib berupa teks.',
             'username.required' => 'Username wajib diisi.',
             'username.string' => 'Username wajib berupa teks.',
+            'username.min' => 'Username minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
-            'password.min' => 'Username minimal 3 karakter.',
+            'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
         ]);
@@ -54,10 +59,10 @@ class AuthController extends Controller
         ]);
 
         return redirect()->route('menu')->with('success', 'Akun berhasil dibuat!');
-
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
 
         $request->validate([
             'username' => ['required', 'string'],
@@ -72,18 +77,18 @@ class AuthController extends Controller
         $customer = Customer::where('username', $request->username)->first();
 
         // LOGIN CUSTOMER
-        if ($customer && password_verify($request->password, $customer->password)){
+        if ($customer && password_verify($request->password, $customer->password)) {
             $data = [
                 'id' => $customer->customer_id,
                 'username' => $customer->username,
             ];
             session()->put('customer', $data);
-            return redirect()->route('menu');
+            return redirect()->route('menu')->with('success', 'Anda berhasil login!');
         }
-
     }
 
-    public function loginPegawai(Request $request) {
+    public function loginPegawai(Request $request)
+    {
 
         $request->validate([
             'email' => ['required', 'email'],
@@ -100,51 +105,49 @@ class AuthController extends Controller
         $chef = Chef::where('email', $request->email)->first();
 
         // LOGIN ADMIN
-        if ($admin && password_verify($request->password, $admin->password)){
+        if ($admin && password_verify($request->password, $admin->password)) {
             $data = [
                 'id' => $admin->admin_id,
                 'name' => $admin->name,
             ];
             session()->put('admin', $data);
-            return redirect()->route('admin-dashboard');
+            return redirect()->route('admin-dashboard')->with('success', 'Anda berhasil login!');
         }
 
         // LOGIN CASHIER
-        if ($cashier && password_verify($request->password, $cashier->password)){
+        if ($cashier && password_verify($request->password, $cashier->password)) {
             $data = [
                 'id' => $cashier->cashier_id,
                 'name' => $cashier->name,
             ];
             session()->put('cashier', $data);
-            return redirect()->route('cashier-dashboard');
+            return redirect()->route('cashier-dashboard')->with('success', 'Anda berhasil login!');
         }
 
         // LOGIN CHEF
-        if ($chef && password_verify($request->password, $chef->password)){
+        if ($chef && password_verify($request->password, $chef->password)) {
             $data = [
                 'id' => $chef->chef_id,
                 'name' => $chef->name,
             ];
             session()->put('chef', $data);
-            return redirect()->route('chef-dashboard');
+            return redirect()->route('chef-dashboard')->with('success', 'Anda berhasil login!');
         }
-
     }
 
     public function logout()
     {
-        Auth::logout();
+        session()->forget('customer');
 
+        return redirect()->route('login')->with('success', 'Anda berhasil logout!');
+    }
+
+    public function logoutPegawai()
+    {
         session()->forget('admin');
         session()->forget('cashier');
         session()->forget('chef');
-        session()->forget('customer');
 
-        // session()->flush();
-        
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
-
-        return redirect()->route('login')->with('success', 'Anda berhasil logout!');
+        return redirect()->route('login-pegawai')->with('success', 'Anda berhasil logout!');
     }
 }

@@ -23,7 +23,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('pesanan-aktif') }}" class="p-2 bg-mY group rounded-md shadow-md flex flex-col justify-between gap-2 items-center text-3xl border-2 border-black w-1/6 hover:bg-dY">
+            <a href="{{ route('pesanan-selesai') }}" class="p-2 bg-mY group rounded-md shadow-md flex flex-col justify-between gap-2 items-center text-3xl border-2 border-black w-1/6 hover:bg-dY">
                 <i class="fas fa-check"></i>
                 <p class="text-center">Pesanan Selesai</p>
                 <div class="bg-white rounded-full w-1/3 text-center group-hover:bg-gray-300">

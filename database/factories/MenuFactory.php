@@ -19,7 +19,7 @@ class MenuFactory extends Factory
             'price' => $this->faker->numberBetween(10000, 100000),
             'description' => $this->faker->sentence(7),
             'category' => $this->faker->randomElement(['Makanan', 'Minuman', 'Camilan']),
-            'stock' => $this->faker->numberBetween(1, 10),
+            'status' => $this->faker->randomElement(['Tersedia', 'Kosong']),
         ];
     }
 }

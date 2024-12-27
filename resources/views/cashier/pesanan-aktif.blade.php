@@ -20,9 +20,8 @@
                     <tr>
                         <th class="border border-black p-2">No</th>
                         <th class="border border-black w-2/12">Username Pelanggan</th>
-                        <th class="border border-black w-2/12">Kode Struk</th>
-                        <th class="border border-black w-3/12">Tanggal</th>
-                        <th class="border border-black w-2/12">Status</th>
+                        <th class="border border-black w-4/12">Kode Struk</th>
+                        <th class="border border-black w-4/12">Tanggal</th>
                         <th class="w-2/12">Aksi</th>
                     </tr>
                 </thead>
@@ -32,9 +31,8 @@
                         <tr class="odd:bg-gray-200 hover:bg-gray-300 text-center">
                             <td class="border border-black">{{ $index + 1 }}</td>
                             <td class="px-2 border border-black">{{ $order->username }}</td>
-                            <td class="px-2 border border-black">{{ $order->receipt_code }}</td>
+                            <td class="px-2 border border-black font-semibold">{{ $order->receipt_code }}</td>
                             <td class="px-2 border border-black">{{ $order->order_date }}</td>
-                            <td class="px-2 border border-black">{{ $order->status }}</td>
                             <td class="p-2 flex gap-2 justify-evenly">
 
                                 <a href="{{ route('bayar-pesanan', [$order->order_id]) }}"
@@ -52,7 +50,7 @@
         </div>
         @else
         <div class="bg-white border border-black p-3 text-center text-2xl">
-            <p>Belum ada pesanan masuk!</p>
+            <p>Belum ada pesanan aktif!</p>
         </div>
         @endif
         

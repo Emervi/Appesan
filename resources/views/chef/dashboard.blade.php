@@ -13,8 +13,8 @@
 
                     <div
                         class="flex flex-col text-sm items-center font-semibold bg-white rounded-md p-2 border border-black">
-                        <p>Atas nama:</p>
-                        <p>{{ $detail->username }}</p>
+                        <p>Nomor Pesanan:</p>
+                        <p>{{ $detail->receipt_code }}</p>
                     </div>
                     <div class="flex gap-2 font-semibold bg-white rounded-md p-2 border border-black">
                         <p>{{ $detail->quantity }}</p>
@@ -44,12 +44,5 @@
             @endif
         </div>
     </div>
-
-    {{-- Script mereload halaman setiap 10 detik --}}
-    <script>
-        setTimeout(function() {
-            window.location.reload();
-        }, 10000); // 10 detik
-    </script>
 
 </x-app-layout>

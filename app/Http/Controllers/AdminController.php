@@ -16,22 +16,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class AdminController extends Controller
 {
     public function dashboard() {
 
-        $name = isset(session('admin')['name']) ? session('admin')['name'] : null;
+        $name = session('admin')['name'];
 
         $todayOrders = Order::where('status', 'Selesai')
-        ->whereDate('created_at', Carbon::today())
+        ->whereDate('order_date', Carbon::today())
         ->count();
 
-        $todayIncomes = Transaction::whereDate('created_at', Carbon::today())
+        $todayIncomes = Transaction::whereDate('transaction_date', Carbon::today())
         ->sum('income');
 
-        $todayMenus = OrderDetail::where('status', 'Disajikan')
-        ->whereDate('created_at', Carbon::today())
+        $todayMenus = OrderDetail::leftJoin('orders', 'orders.order_id', '=', 'detail_orders.order_id')
+        ->where('detail_orders.status', 'Disajikan')
+        ->whereDate('orders.order_date', Carbon::today())
         ->count();
 
         return view('admin.dashboard', [
@@ -46,11 +49,14 @@ class AdminController extends Controller
     // CRUD CUSTOMER ====================================================================================================
     public function daftarCustomer() {
 
-        $customers = Customer::all();
+        $perPage = 10;
 
-        return view('admin.daftar-customer', [
-            'customers' => $customers
-        ]);
+        $customers = Customer::latest()->paginate($perPage);
+
+        $currentPage = $customers->currentPage();
+        $offset = ($currentPage - 1) * $perPage;
+
+        return view('admin.daftar-customer', compact('customers', 'offset'));
 
     }
 
@@ -64,16 +70,18 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'username' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'username' => ['required', 'string', 'min:3'],
+            'email' => ['required', 'email', 'unique:customers,email'],
             'password' => ['required', 'min:8'],
         ],[
             'name.required' => 'Nama wajib diisi.',
-            'name.string' => 'Nama wajib terdiri dari huruf.',
-            'username.required' => 'Alamat wajib diisi.',
-            'username.string' => 'Alamat wajib terdiri dari huruf.',
+            'name.string' => 'Nama wajib berupa teks.',
+            'username.required' => 'Username wajib diisi.',
+            'username.string' => 'Username wajib berupa teks.',
+            'username.min' => 'Username minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
         ]);
@@ -101,15 +109,17 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'username' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'username' => ['required', 'string', 'min:3'],
+            'email' => ['required', 'email', 'unique:customers,email,' . $customer_id . ',customer_id'],
         ],[
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama wajib terdiri dari huruf.',
-            'username.required' => 'Alamat wajib diisi.',
-            'username.string' => 'Alamat wajib terdiri dari huruf.',
+            'username.required' => 'Username wajib diisi.',
+            'username.string' => 'Username wajib berupa teks.',
+            'username.min' => 'Username minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
         ]);
 
         Customer::where('customer_id', $customer_id)->update([
@@ -127,7 +137,7 @@ class AdminController extends Controller
         Customer::where('customer_id', $customer_id)
         ->delete();
 
-        return redirect()->back()->with('swal', ['type' => 'success', 'message' => 'Pelanggan berhasil dihapus!']);
+        return redirect()->back()->with('success', 'Pelanggan berhasil dihapus!');
 
     }
     // CRUD CUSTOMER \\
@@ -135,13 +145,25 @@ class AdminController extends Controller
 
 
     // CRUD MENU ====================================================================================================
-    public function daftarMenu() {
+    public function daftarMenu(Request $request) {
 
-        $menus = Menu::all();
+        $categories = Menu::distinct()
+        ->pluck('category');
+        
+        $filter = $request->query('category');
 
-        return view('admin.daftar-menu', [
-            'menus' => $menus
-        ]);
+        $perPage = 10;
+        if($filter == 'all' || empty($filter)) {
+            $menus = Menu::latest()->paginate($perPage);
+        }else{
+            $menus = Menu::where('category', $filter)
+            ->latest()
+            ->paginate($perPage);
+        }
+        $currentPage = $menus->currentPage();
+        $offset = ($currentPage - 1) * $perPage;
+
+        return view('admin.daftar-menu', compact('menus', 'offset', 'categories'));
 
     }
 
@@ -163,7 +185,7 @@ class AdminController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'category' => $request->category,
-            'stock' => $request->stock
+            'status' => $request->status
         ]);
 
         return redirect()->route('admin.daftar-menu')->with('success', 'Menu berhasil dibuat!');
@@ -186,7 +208,7 @@ class AdminController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'description' => ['required', 'string'],
             'category' => ['required'],
-            'stock' => ['required', 'numeric', 'min:0'],
+            'status' => ['required'],
         ], [
             'image.image' => 'File yang diunggah harus berupa gambar.',
             'image.mimes' => 'Gambar harus berformat png, jpg, atau jpeg.',
@@ -204,9 +226,7 @@ class AdminController extends Controller
             
             'category.required' => 'Kategori harus dipilih.',
             
-            'stock.required' => 'Stok harus diisi.',
-            'stock.numeric' => 'Stok harus berupa angka.',
-            'stock.min' => 'Stok tidak boleh kurang dari 0.',
+            'status.required' => 'Status harus diisi.',
         ]);
 
         // logic untuk memasukan foto
@@ -227,7 +247,7 @@ class AdminController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'category' => $request->category,
-            'stock' => $request->stock,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('admin.daftar-menu')->with('success', 'Menu berhasil diubah!');
@@ -239,7 +259,7 @@ class AdminController extends Controller
         Menu::where('menu_id', $menu_id)
         ->delete();
 
-        return redirect()->back()->with('swal', ['type' => 'success', 'message' => 'Menu berhasil dihapus!']);
+        return redirect()->back()->with('success', 'Menu berhasil dihapus!');
 
     }
     // CRUD MENU \\
@@ -249,11 +269,14 @@ class AdminController extends Controller
     // CRUD ADMIN ====================================================================================================
     public function daftarAdmin() {
 
-        $admins = Admin::all();
+        $perPage = 10;
 
-        return view('admin.daftar-admin', [
-            'admins' => $admins
-        ]);
+        $admins = Admin::latest()->paginate($perPage);
+
+        $currentPage = $admins->currentPage();
+        $offset = ($currentPage - 1) * $perPage;
+
+        return view('admin.daftar-admin', compact('admins', 'offset'));
 
     }
 
@@ -267,7 +290,7 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:admins,email'],
             'password' => ['required', 'min:8'],
             'address' => ['required', 'string'],
         ],[
@@ -275,6 +298,7 @@ class AdminController extends Controller
             'name.string' => 'Nama wajib terdiri dari huruf.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'address.required' => 'Alamat wajib diisi.',
@@ -304,7 +328,7 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:admins,email,' . $admin_id . ',admin_id'],
             'address' => ['required', 'string'],
             // 'password' => ['required', 'min:8'],
         ],[
@@ -312,6 +336,7 @@ class AdminController extends Controller
             'name.string' => 'Nama wajib terdiri dari huruf.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'address.required' => 'Alamat wajib diisi.',
             'address.string' => 'Alamat wajib terdiri dari huruf.',
             // 'password.required' => 'Password wajib diisi.',
@@ -334,7 +359,7 @@ class AdminController extends Controller
         Admin::where('admin_id', $admin_id)
         ->delete();
 
-        return redirect()->back()->with('swal', ['type' => 'success', 'message' => 'Admin berhasil dihapus!']);
+        return redirect()->back()->with('success', 'Admin berhasil dihapus!');
 
     }
     // CRUD ADMIN \\
@@ -344,11 +369,14 @@ class AdminController extends Controller
     // CRUD CASHIER ====================================================================================================
     public function daftarCashier() {
 
-        $cashiers = Cashier::all();
+        $perPage = 10;
 
-        return view('admin.daftar-cashier', [
-            'cashiers' => $cashiers
-        ]);
+        $cashiers = Cashier::latest()->paginate($perPage);
+
+        $currentPage = $cashiers->currentPage();
+        $offset = ($currentPage - 1) * $perPage;
+
+        return view('admin.daftar-cashier', compact('cashiers', 'offset'));
 
     }
 
@@ -362,7 +390,7 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:cashiers,email'],
             'password' => ['required', 'min:8'],
             'address' => ['required', 'string'],
         ],[
@@ -370,6 +398,7 @@ class AdminController extends Controller
             'name.string' => 'Nama wajib terdiri dari huruf.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'address.required' => 'Alamat wajib diisi.',
@@ -399,13 +428,14 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:cashiers,email,' . $cashier_id . ',cashier_id'],
             'address' => ['required', 'string'],
         ],[
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama wajib terdiri dari huruf.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'address.required' => 'Alamat wajib diisi.',
             'address.string' => 'Alamat wajib terdiri dari huruf.',
         ]);
@@ -425,7 +455,7 @@ class AdminController extends Controller
         Cashier::where('cashier_id', $cashier_id)
         ->delete();
 
-        return redirect()->back()->with('swal', ['type' => 'success', 'message' => 'Kasir berhasil dihapus!']);
+        return redirect()->back()->with('success', 'Kasir berhasil dihapus!');
 
     }
     // CRUD CASHIER \\
@@ -435,11 +465,14 @@ class AdminController extends Controller
     // CRUD CHEF ====================================================================================================
     public function daftarChef() {
 
-        $chefs = Chef::all();
+        $perPage = 10;
 
-        return view('admin.daftar-chef', [
-            'chefs' => $chefs
-        ]);
+        $chefs = Chef::latest()->paginate($perPage);
+
+        $currentPage = $chefs->currentPage();
+        $offset = ($currentPage - 1) * $perPage;
+
+        return view('admin.daftar-chef', compact('chefs', 'offset'));
 
     }
 
@@ -453,7 +486,7 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:chefs,email'],
             'password' => ['required', 'min:8'],
             'address' => ['required', 'string'],
         ],[
@@ -461,6 +494,7 @@ class AdminController extends Controller
             'name.string' => 'Nama wajib terdiri dari huruf.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'address.required' => 'Alamat wajib diisi.',
@@ -490,13 +524,14 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'unique:chefs,email,' . $chef_id . ',chef_id'],
             'address' => ['required', 'string'],
         ],[
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama wajib terdiri dari huruf.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email salah.',
+            'email.unique' => 'Email sudah terdaftar.',
             'address.required' => 'Alamat wajib diisi.',
             'address.string' => 'Alamat wajib terdiri dari huruf.',
         ]);
@@ -516,10 +551,12 @@ class AdminController extends Controller
         Chef::where('chef_id', $chef_id)
         ->delete();
 
-        return redirect()->back()->with('swal', ['type' => 'success', 'message' => 'Koki berhasil dihapus!']);
+        return redirect()->back()->with('success', 'Koki berhasil dihapus!');
 
     }
     // CRUD CHEF \\
+
+
 
     // CRUD TRANSACTION ====================================================================================================
     public function daftarTransaction() {
@@ -544,7 +581,55 @@ class AdminController extends Controller
 
         return view('admin.detail-transaction', compact('transaction'));
 
+        return view('admin.detail-transaction');
     }
+
+    public function laporanKeuangan() {
+
+        // Set opsi DomPDF
+        $options = new Options();
+        $options->set('defaultFont', 'Courier');
+        $dompdf = new Dompdf($options);
+
+        // Render HTML ke PDF
+        $html = view('admin.buat-laporan')->render();
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // menambahkan nomor halaman
+        $canvas = $dompdf->getCanvas();
+        $fontMetrics = $dompdf->getFontMetrics();
+        $pageCount = $dompdf->getCanvas()->get_page_count();
+
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
+                $text = "$pageNumber";
+                $width = $fontMetrics->getTextWidth($text, 'Courier', 12);
+                $canvas->text(560 - $width, 815, $text, null, 12); // Ubah posisi x dan y sesuai kebutuhan
+            });
+        }
+
+        // Menyimpan PDF di public path
+        $output = $dompdf->output();
+        // $pdfPath = public_path('pdf/Laporan Transaksi.pdf');
+        // file_put_contents($pdfPath, $output);
+
+        // Mengarahkan ke halaman untuk membuka file PDF
+        return response()->stream(
+            function () use ($output) {
+                echo $output;
+            },
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="Laporan Transaksi.pdf"',
+            ]
+        );
+
+    }
+
     // CRUD TRANSACTION \\
 
 }

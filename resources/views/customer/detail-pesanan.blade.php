@@ -15,21 +15,25 @@
 
         <div class="bg-mB p-4 border-2 border-black">
             @foreach ($ordersDetail as $data)
-                <div class="flex items-center border border-black rounded-lg p-2 bg-gray-50">
+                <div class="flex items-center mb-1 border border-black rounded-lg p-2 bg-gray-50">
                     <img src="{{ asset('images/' . $data->image) }}" alt="Foto menu"
                         class="size-20 object-cover rounded-md">
 
                     <div class="ml-4 flex-1">
                         <h2 class="text-sm font-semibold text-gray-700">{{ $data->name }}</h2>
-                        <p class="text-xs text-gray-500">Qty: {{ $data->quantity }}</p>
+                        <p class="text-xs text-gray-500">Kuantitas: {{ $data->quantity }}</p>
                         <p class="text-sm text-gray-700 font-medium">Sub Total: Rp
                             {{ number_format($data->sub_total, 0, ',', '.') }}</p>
-                        @if ($data->status == 'Dipesan')
-                            <p class="text-sm text-gray-500 font-medium">Diproses!</p>
+                        @if ($data->status == 'Diproses')
+                            <p class="text-sm text-gray-500 font-medium">⏳Diproses⏳</p>
                         @elseif ($data->status == 'Dimasak')
-                            <p class="text-sm text-gray-500 font-medium">Sedang dimasak!</p>
+                            <p class="text-sm text-gray-500 font-medium">👩‍🍳Sedang dimasak👨‍🍳</p>
+                        @elseif ($data->status == 'Dibatalkan')
+                            <p class="text-sm text-gray-500 font-medium">❌Dibatalkan❌</p>
+                        @elseif ($data->status == 'Disajikan')
+                            <p class="text-sm text-gray-500 font-medium">🍴Disajikan🍴</p>
                         @else
-                            <p class="text-sm text-gray-500 font-medium">Siap disajikan!</p>
+                            <p class="text-sm text-gray-500 font-medium">✔Selesai✔</p>
                         @endif
                     </div>
                 </div>

@@ -23,11 +23,10 @@ class ChefController extends Controller
         ->leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
         ->select('detail_orders.*', 'menus.*', 'orders.*', 'customers.*')
         ->where('detail_orders.status', 'Dimasak')
+        ->oldest('detail_orders.updated_at')
         ->get();
 
-        return view('chef.dashboard', [
-            'orders' => $orders,
-        ]);
+        return view('chef.dashboard', compact('orders'));
 
     }
 

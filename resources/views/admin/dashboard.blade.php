@@ -38,4 +38,11 @@
 
     </div>
 
+    {{-- Script mereload halaman setiap 10 detik --}}
+    <script>
+        setTimeout(function() {
+            window.location.reload();
+        }, 15000); // 15 detik
+    </script>
+
 </x-app-layout>

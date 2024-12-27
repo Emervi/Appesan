@@ -21,35 +21,42 @@ use Illuminate\Support\Facades\Route;
 */
 
 // TEST AREA
-Route::get('/send-notification', [TestController::class, 'sendNotification'])->name('send-notification');
+Route::get('/success', [TestController::class, 'sendSuccess'])->name('send-success');
+Route::get('/fail', [TestController::class, 'sendFail'])->name('send-fail');
 Route::get('/test', function () {
     return view('test');
 });
 // TEST AREA \\
 
-// HOME
-Route::get('/', function () {
-    return redirect()->route('login');
-});
-
-// REGISTER
-Route::get('/register', [AuthController::class, 'tampilanRegister'])->name('register');
-
-// LOGIN
-Route::get('/login', [AuthController::class, 'tampilanLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-
-// LOGIN PEGAWAI
-Route::get('/login-pegawai', [AuthController::class, 'tampilanLoginPegawai'])->name('login-pegawai');
-Route::post('/login-pegawai', [AuthController::class, 'loginPegawai']);
-
 // LOGOUT
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');  
 
+// LOGOUT PEGAWAI
+Route::post('/logout-pegawai', [AuthController::class, 'logoutPegawai'])->name('logout-pegawai');  
+
+Route::middleware('cekNullRole')->group(function () {
+
+    // HOME
+    Route::get('/', function () {
+        return redirect()->route('login');
+    });
+
+    // REGISTER
+    Route::get('/register', [AuthController::class, 'tampilanRegister'])->name('register');
+
+    // LOGIN
+    Route::get('/login', [AuthController::class, 'tampilanLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+
+    // LOGIN PEGAWAI
+    Route::get('/login-pegawai', [AuthController::class, 'tampilanLoginPegawai'])->name('login-pegawai');
+    Route::post('/login-pegawai', [AuthController::class, 'loginPegawai']);
+
+});
 
 
 // HALAMAN CUSTOMER
-Route::prefix('customer')->group(function () {
+Route::middleware('cekRoleCustomer')->group(function () {
 
     // menu
     Route::get('/menu', [CustomerController::class, 'menu'])->name('menu');
@@ -81,28 +88,26 @@ Route::prefix('customer')->group(function () {
     Route::get('/pesanan', [CustomerController::class, 'pesanan'])->name('pesanan');
 
     // hapus / batalkan pesanan
-    Route::delete('/pesanan/hapus-pesanan/{order_id}', [CustomerController::class, 'hapusOrder'])->name('hapus-pesanan');
+    Route::put('/pesanan/batalkan-pesanan/{order_id}', [CustomerController::class, 'batalkanOrder'])->name('batalkan-pesanan');
 
     // detail pesanan
     Route::get('/pesanan/detail-pesanan/{order_id}', [CustomerController::class, 'detailOrder'])->name('detail-pesanan');
-
 });
 
 
 
 // HALAMAN CHEF
-Route::prefix('chef')->group(function () {
+Route::prefix('chef')->middleware('cekRolePegawai:chef')->group(function () {
 
     Route::get('/dashboard', [ChefController::class, 'dashboard'])->name('chef-dashboard');
 
     Route::put('/selesaikan-menu/{order_id}/{menu_id}', [ChefController::class, 'selesaikanMenu'])->name('selesaikan-menu');
-
 });
 
 
 
 // HALAMAN CASHIER
-Route::prefix('cashier')->group(function () {
+Route::prefix('cashier')->middleware('cekRolePegawai:cashier')->group(function () {
 
     Route::get('/dashboard', [CashierController::class, 'dashboard'])->name('cashier-dashboard');
 
@@ -128,15 +133,25 @@ Route::prefix('cashier')->group(function () {
     // terima transaksi
     Route::post('/terima-transaksi', [CashierController::class, 'terimaTransaksi'])->name('terima-transaksi');
 
-    // tampilan bayar pesanan
-    Route::get('/struk-pembayaran', [CashierController::class, 'strukPembayaran'])->name('struk-pembayaran');
+    // tampilan bayar selesai
+    Route::get('/bayar-selesai/{order_id}/{payment}', [CashierController::class, 'bayarSelesai'])->name('bayar-selesai');
 
+    // tampilan bayar pesanan
+    Route::get('/struk-pembayaran/{order_id}/{payment}', [CashierController::class, 'strukPembayaran'])->name('struk-pembayaran');
+
+
+
+    // tampilan pesanan selesai
+    Route::get('/pesanan-selesai', [CashierController::class, 'pesananSelesai'])->name('pesanan-selesai');
+
+    // detail pesanan selesai
+    Route::get('/pesanan-selesai/detail/{order_id}', [CashierController::class, 'detailPesananSelesai'])->name('detail-pesanan-selesai');
 });
 
 
 
 // HALAMAN ADMIN
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('cekRolePegawai:admin')->group(function () {
 
     // dashboard admin
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
@@ -227,11 +242,10 @@ Route::prefix('admin')->group(function () {
     Route::get('/daftar-transaksi', [AdminController::class, 'daftarTransaction'])->name('admin.daftar-transaksi');
 
     // detail transaksi
-    Route::put('/daftar-transaksi/{transaction_id}', [AdminController::class, 'detailTransaction'])->name('admin.detail-transaksi');
+    Route::get('/detail-transaksi/{transaction_id}', [AdminController::class, 'detailTransaction'])->name('admin.detail-transaksi');
 
     // laporan keuangan
-    Route::get('/laporan-keuangan', [AdminController::class, 'laporanKeuangan'])->name('laporan-keuangan');
-
+    Route::post('/laporan-keuangan', [AdminController::class, 'laporanKeuangan'])->name('laporan-keuangan');
 });
 
 

@@ -29,7 +29,7 @@ class MenuRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'description' => ['required', 'string'],
             'category' => ['required'],
-            'stock' => ['required', 'numeric', 'min:0'],
+            'status' => ['required'],
         ];
     }
 
@@ -58,9 +58,7 @@ class MenuRequest extends FormRequest
             
             'category.required' => 'Kategori harus dipilih.',
             
-            'stock.required' => 'Stok harus diisi.',
-            'stock.numeric' => 'Stok harus berupa angka.',
-            'stock.min' => 'Stok tidak boleh kurang dari 0.',
+            'status.required' => 'Status harus diisi.',
         ];
     }
 }

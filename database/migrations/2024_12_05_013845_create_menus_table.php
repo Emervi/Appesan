@@ -20,7 +20,7 @@ class CreateMenusTable extends Migration
             $table->float('price');
             $table->string('description');
             $table->string('category', 100);
-            $table->integer('stock');
+            $table->enum('status', ['Tersedia', 'Kosong']);
             $table->timestamps();
         });
     }

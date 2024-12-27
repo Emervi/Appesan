@@ -38,7 +38,7 @@
                 <tbody>
                     @foreach ($chefs as $index => $chef)
                         <tr class="odd:bg-gray-200 hover:bg-gray-300">
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ $offset + $index + 1 }}</td>
                             <td class="px-2">{{ $chef->name }}</td>
                             <td class="px-2">{{ $chef->email }}</td>
                             <td class="px-2">{{ $chef->address }}</td>
@@ -63,8 +63,13 @@
                         </tr>
                     @endforeach
                 </tbody>
-
             </table>
+            <div class="mt-3">
+                @if ($offset > -1)
+                    {{-- pagination --}}
+                    {{ $chefs->links() }}
+                @endif
+            </div>
         </div>
     </div>
 

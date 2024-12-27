@@ -67,7 +67,7 @@
                         </div>
                     </div>
 
-                    <div class="ml-3 mb-3">
+                    <div class="ml-3 mb-2.5">
                         <h3 for="price">Harga:</h3>
                         <input type="number" name="price" value="{{ old('price', $data->price) }}"
                             placeholder="Masukan harga"
@@ -78,10 +78,12 @@
                     </div>
 
                     <div class="ml-3 mb-3">
-                        <h3 for="stock">Stok:</label>
-                        <input type="number" name="stock" value="{{ old('stock', $data->stock) }}"
-                            placeholder="Masukan stok" class="w-full p-1.5 rounded border border-black outline-none">
-                        @error('stock')
+                        <label>Status:</label>
+                        <div class="flex items-center gap-2 p-1.5">
+                            <input type="radio" id="tersedia" name="status" value="Tersedia" {{ old('status') || $data->status == "Tersedia" ? 'checked' : '' }} class="size-6"> <label for="tersedia">Tersedia</label>
+                            <input type="radio" id="kosong" name="status" value="Kosong" {{ old('status') || $data->status == "Kosong" ? 'checked' : '' }} class="size-6 ml-3"> <label for="kosong">Kosong</label>
+                        </div>
+                        @error('status')
                             <p class="text-red-500 text-sm font-medium">{{ $message }}</p>
                         @enderror
                     </div>

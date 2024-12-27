@@ -9,7 +9,7 @@
                 <i class="fas fa-arrow-left text-3xl"></i>
             </a>
             <div class="absolute inset-0 flex justify-center items-center">
-                <h1 class="text-center text-2xl font-bold">Detail Pesanan Masuk</h1>
+                <h1 class="text-center text-2xl font-bold">Detail Pesanan Selesai</h1>
             </div>
         </div>
 
@@ -33,7 +33,6 @@
             @endforeach
         </div>
 
-        {{-- Footer status --}}
         <div class="bg-mY font-semibold text-xl flex flex-col justify-between p-2 border-2 border-t-0 border-black rounded-bl-lg rounded-br-lg font-poppins">
             <h3>{{ $order[0]->receipt_code }}</h3>
             <div class="flex justify-between">

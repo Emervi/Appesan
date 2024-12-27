@@ -18,7 +18,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->dateTime('order_date');
             $table->string('receipt_code')->unique()->nullable();
-            $table->enum('status', ['Dipesan', 'Diproses', 'Disajikan', 'Selesai']);
+            $table->enum('status', ['Dipesan', 'Diproses', 'Disajikan', 'Selesai', 'Dibatalkan']);
             $table->timestamps();
             
             $table->foreign('customer_id')->references('customer_id')->on('customers')->onDelete('cascade');

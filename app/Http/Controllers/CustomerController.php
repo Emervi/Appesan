@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -15,10 +16,12 @@ class CustomerController extends Controller
 {
 
     // function untuk membuat kode unik order
-    private function generateUniqueCode($customer_id)
+    private function generateUniqueCode($customer_id, $increment)
     {
-        $randomString = Str::upper(Str::random(4)); // String acak sepanjang 4 karakter
-        return '#' . $customer_id . $randomString; // Contoh hasil: STRUK-101-ABCD
+        $nowDate = Carbon::now()->format('d');
+        $nowMonth = Carbon::now()->format('m');
+        $nowCombine = $nowDate . $nowMonth;
+        return '#' . $customer_id . $nowCombine . '-' . $increment;
     }
 
 
@@ -76,7 +79,7 @@ class CustomerController extends Controller
             'quantity' => $request->quantity,
         ]);
 
-        return redirect()->back()->with('success', 'Menu berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Menu masuk ke keranjang!');
     }
 
     public function hapusMenu($menu_id)
@@ -87,7 +90,7 @@ class CustomerController extends Controller
             ->where('menu_id', $menu_id)
             ->delete();
 
-        return redirect()->back()->with('success', 'Menu berhasil dihapus dari keranjang!');
+        return redirect()->back()->with('success', 'Menu dihapus dari keranjang!');
     }
 
     public function tambahKuantitas($menu_id)
@@ -103,7 +106,7 @@ class CustomerController extends Controller
             'quantity' => $cartQuantity + 1,
         ]);
 
-        return redirect()->back()->with('success', 'Kuantitas +1');
+        return redirect()->back();
     }
 
     public function kurangiKuantitas($menu_id)
@@ -119,36 +122,54 @@ class CustomerController extends Controller
             'quantity' => $cartQuantity - 1,
         ]);
 
-        return redirect()->back()->with('success', 'Kuantitas -1');
+        return redirect()->back();
     }
     // CART \\
 
 
 
     // ORDER
-    public function pesanan()
+    public function pesanan(Request $request)
     {
         $customer_id = session('customer')['id'];
-        $orders = Order::where('customer_id', $customer_id)
-            ->whereIn('status', ['Dipesan', 'Diproses'])
-            ->get();
 
-        return view('customer.pesanan', [
-            'orders' => $orders,
-        ]);
+        $statuses = Order::where('customer_id', $customer_id)
+            ->distinct()
+            ->pluck('status');
+
+        $filter = $request->query('status');
+
+        if ($filter == 'all' || empty($filter)) {
+            $orders = Order::where('customer_id', $customer_id)
+                ->orderBy('status')
+                ->get();
+        } else {
+            $orders = Order::where('customer_id', $customer_id)
+                ->where('status', $filter)
+                ->get();
+        }
+
+
+        return view('customer.pesanan', compact('orders', 'statuses'));
     }
 
     public function tambahOrder(Request $request)
     {
         $customer_id = session('customer')['id'];
+
         $order = Order::create([
             'customer_id' => $customer_id,
             'order_date' => now(),
-            'receipt_code' => $this->generateUniqueCode($customer_id),
             'status' => 'Dipesan',
         ]);
 
         $orderDetailId = $order->order_id;
+
+        Order::where('customer_id', $customer_id)
+            ->where('order_id', $orderDetailId)
+            ->update([
+                'receipt_code' => $this->generateUniqueCode($customer_id, $orderDetailId),
+            ]);
 
         foreach ($request->menu_id as $index => $menu) {
             OrderDetail::create([
@@ -156,7 +177,7 @@ class CustomerController extends Controller
                 'menu_id' => $menu,
                 'quantity' => $request->quantity[$index],
                 'sub_total' => $request->price[$index] * $request->quantity[$index],
-                'stastus' => 'Dipesan',
+                'status' => 'Diproses',
             ]);
         }
 
@@ -165,12 +186,20 @@ class CustomerController extends Controller
         return redirect()->route('pesanan')->with('success', 'Pesanan berhasil dibuat!');
     }
 
-    public function hapusOrder($order_id)
+    public function batalkanOrder($order_id)
     {
 
-        Order::where('order_id', $order_id)->delete();
+        Order::where('order_id', $order_id)
+            ->update([
+                'status' => 'Dibatalkan',
+            ]);
 
-        return redirect()->back()->with('success', 'Order berhasil dibatalkan!');
+        OrderDetail::where('order_id', $order_id)
+            ->update([
+                'status' => 'Dibatalkan',
+            ]);
+
+        return redirect()->back()->with('success', 'Pesanan berhasil dibatalkan!');
     }
 
     public function detailOrder($order_id)

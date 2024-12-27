@@ -18,7 +18,7 @@ class CreateDetailOrdersTable extends Migration
             $table->unsignedBigInteger('menu_id');
             $table->integer('quantity');
             $table->float('sub_total');
-            $table->enum('status', ['Dipesan', 'Dimasak', 'Disajikan']);
+            $table->enum('status', ['Diproses', 'Dimasak', 'Disajikan', 'Selesai', 'Dibatalkan']);
             $table->timestamps();
 
             $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');

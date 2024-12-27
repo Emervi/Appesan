@@ -19,7 +19,7 @@
                             <p class="font-bold mb-3">{{ $cart->formatted_price }}</p>
                             <div class="flex flex-col">
                                 <p>Subtotal:</p>
-                                <p class="price" data-price="{{ $cart->price * $cart->quantity }}"></p>
+                                <p>Rp. {{ number_format($cart->price * $cart->quantity, 0, ',', '.') }}</p>
                             </div>
                         </div>
 
@@ -89,19 +89,5 @@
         @else  
         @endif
     </div>
-
-    <script>
-        // Menambahkan "Rp." dan memformat price dengan pemisah ribuan
-        document.querySelectorAll('.price').forEach(function(item) {
-            // Ambil price dari atribut data-price
-            var price = item.getAttribute('data-price');
-
-            // Format price dengan menambahkan 'Rp.' dan pemisah ribuan
-            var formattedPrice = 'Rp. ' + Number(price).toLocaleString('id-ID');
-
-            // Tampilkan price yang sudah diformat di elemen
-            item.textContent = formattedPrice;
-        });
-    </script>
 
 </x-app-layout>

@@ -32,7 +32,7 @@
                 <tbody>
                     @foreach ($cashiers as $index => $cashier)
                         <tr class="odd:bg-gray-200 hover:bg-gray-300">
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ $offset + $index + 1 }}</td>
                             <td class="px-2">{{ $cashier->name }}</td>
                             <td class="px-2">{{ $cashier->email }}</td>
                             <td class="px-2">{{ $cashier->address }}</td>
@@ -57,8 +57,13 @@
                         </tr>
                     @endforeach
                 </tbody>
-
             </table>
+            <div class="mt-3">
+                @if ($offset > -1)
+                    {{-- pagination --}}
+                    {{ $cashiers->links() }}
+                @endif
+            </div>
         </div>
     </div>
 
