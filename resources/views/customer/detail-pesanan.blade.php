@@ -43,7 +43,7 @@
         {{-- Footer status --}}
         <div class="bg-mY p-2 border-2 border-t-0 border-black rounded-bl-lg rounded-br-lg font-poppins">
             <h3 class="text-sm font-semibold text-gray-700">Total Harga Pesanan:</h3>
-            <p class="font-semibold">Rp. {{ number_format($totalPrice, 0, ',', '.') }}</p>
+            <p class="font-semibold">Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
         </div>
 
     </div>

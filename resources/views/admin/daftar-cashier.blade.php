@@ -56,6 +56,11 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if (empty($cashiers[0]))
+                        <tr>
+                            <td colspan="5" class="text-center font-bold text-xl p-3">Tidak ada kasir.</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
             <div class="mt-3">

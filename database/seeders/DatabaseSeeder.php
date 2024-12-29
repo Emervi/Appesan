@@ -13,42 +13,58 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
         \App\Models\Admin::create([
-            'name' => 'mamat',
+            'name' => 'Mamat',
             'email' => 'mamat@gmail.com',
             'password' => bcrypt('password'),
-            'address' => 'Jl. Merdekah',
+            'address' => 'Jl. Laravel VIII',
         ]);
-        \App\Models\Admin::factory()->count(10)->create();
+        \App\Models\Admin::create([
+            'name' => 'Vito',
+            'email' => 'vito@gmail.com',
+            'password' => bcrypt('password'),
+            'address' => 'Jl. Earth gem',
+        ]);
+        // \App\Models\Admin::factory()->count(10)->create();
 
 
         \App\Models\Chef::create([
-            'name' => 'juna',
+            'name' => 'Juna',
             'email' => 'juna@gmail.com',
             'password' => bcrypt('password'),
-            'address' => 'Jl. Jauh',
+            'address' => 'Jl. Laravel',
+        ]);
+        \App\Models\Chef::create([
+            'name' => 'Arnold',
+            'email' => 'arnold@gmail.com',
+            'password' => bcrypt('password'),
+            'address' => 'Jl. Python',
         ]);
         \App\Models\Chef::factory()->count(10)->create();
 
-
         \App\Models\Cashier::create([
-            'name' => 'jon',
+            'name' => 'Jon',
             'email' => 'jon@gmail.com',
             'password' => bcrypt('password'),
-            'address' => 'Jl. Kuda',
+            'address' => 'Jl. Javascript',
+        ]);
+        \App\Models\Cashier::create([
+            'name' => 'Skuid',
+            'email' => 'skuid@gmail.com',
+            'password' => bcrypt('password'),
+            'address' => 'Jl. Bikin Botom',
         ]);
         \App\Models\Cashier::factory()->count(10)->create();
 
         \App\Models\Customer::create([
-            'name' => 'Kepin Pelatihan',
-            'username' => 'bungs',
+            'name' => 'Kepin Donald',
+            'username' => 'Kepin',
             'email' => 'kepin@gmail.com',
             'password' => bcrypt('password'),
         ]);
         \App\Models\Customer::create([
             'name' => 'Levi Athan',
-            'username' => 'levis',
+            'username' => 'Levis',
             'email' => 'levi@gmail.com',
             'password' => bcrypt('password'),
         ]);
@@ -66,7 +82,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Menu::create([
             'image' => 'chickenWings.jpg',
             'name' => 'Chicken Wingz',
-            'price' => 35000,
+            'price' => 25000,
             'description' => 'Chicken wings dengan bumbu barbeque dari Texas dan Mexico yang pastinya sangat nendang.',
             'category' => 'Makanan',
             'status' => 'Tersedia'
@@ -74,7 +90,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Menu::create([
             'image' => 'french.jpg',
             'name' => 'French Fries',
-            'price' => 14000,
+            'price' => 13000,
             'description' => 'French fries yang dibuat dengan kentang asli yang memiliki rasa gurih asin.',
             'category' => 'Makanan',
             'status' => 'Tersedia'
@@ -83,27 +99,42 @@ class DatabaseSeeder extends Seeder
         \App\Models\Menu::create([
             'image' => 'macaron.jpg',
             'name' => 'Macaron',
-            'price' => 26000,
+            'price' => 21500,
             'description' => 'Macaron terbuat dari tepung yang dicampur gula lalu diolah seperti kue, memiliki rasa manis seperti gulali.',
-            'category' => 'Camilan',
+            'category' => 'Dessert',
+            'status' => 'Tersedia'
+        ]);
+        \App\Models\Menu::create([
+            'image' => 'pie.jpg',
+            'name' => 'Pie Buah',
+            'price' => 10500,
+            'description' => 'Berasal dari buah yang segar dan asli, pie buah ini cocok bagi yang ingin makanan rendah kalori.',
+            'category' => 'Dessert',
             'status' => 'Tersedia'
         ]);
 
         \App\Models\Menu::create([
-            'image' => 'pisang.jpeg',
-            'name' => 'Pisang Goreng',
-            'price' => 17000,
-            'description' => 'Memiliki rasa manis dengan tekstur gurih, pisang goreng ini cocok dimakan selagi hangat',
+            'image' => 'gehu.jpg',
+            'name' => 'Gehu',
+            'price' => 10000,
+            'description' => 'Gehu dari tahu susu yang digoreng secara renyah.',
             'category' => 'Camilan',
             'status' => 'Kosong'
         ]);
-
         \App\Models\Menu::create([
-            'image' => 'pie.jpg',
-            'name' => 'Pie Buah',
-            'price' => 12000,
-            'description' => 'Berasal dari buah yang segar dan asli, pie buah ini cocok bagi yang ingin makanan rendah kalori.',
-            'category' => 'Dessert',
+            'image' => 'pisang.jpeg',
+            'name' => 'Pisang Goreng',
+            'price' => 10000,
+            'description' => 'Memiliki rasa manis dengan tekstur gurih, pisang goreng ini cocok dimakan selagi hangat',
+            'category' => 'Camilan',
+            'status' => 'Tersedia'
+        ]);
+        \App\Models\Menu::create([
+            'image' => 'risol.jpg',
+            'name' => 'Risol Mayo',
+            'price' => 10000,
+            'description' => 'Risol dengan isian mayonaise, telur, dan sosis.',
+            'category' => 'Camilan',
             'status' => 'Tersedia'
         ]);
 
@@ -157,6 +188,6 @@ class DatabaseSeeder extends Seeder
         ]);
         // \App\Models\Menu::factory()->count(10)->create();
 
-        \App\Models\Transaction::factory()->count(10)->create();
+        // \App\Models\Transaction::factory()->count(10)->create();
     }
 }

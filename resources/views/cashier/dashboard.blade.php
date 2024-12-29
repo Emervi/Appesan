@@ -30,14 +30,15 @@
                     {{ $completeOrder }}
                 </div>
             </a>
+
+            <a href="{{ route('pesanan-batal') }}" class="p-2 bg-mY group rounded-md shadow-md flex flex-col justify-between gap-2 items-center text-3xl border-2 border-black w-1/6 hover:bg-dY">
+                <i class="fas fa-times"></i>
+                <p class="text-center">Pesanan Batal</p>
+                <div class="bg-white rounded-full w-1/3 text-center group-hover:bg-gray-300">
+                    {{ $canceledOrder }}
+                </div>
+            </a>
         </div>
     </div>
-
-    {{-- Script mereload halaman setiap 10 detik --}}
-    <script>
-        setTimeout(function() {
-            window.location.reload();
-        }, 10000); // 10 detik
-    </script>
 
 </x-app-layout>

@@ -21,7 +21,7 @@
                         <th class="border border-black p-2">No</th>
                         <th class="border border-black w-2/12">Username Pelanggan</th>
                         <th class="border border-black w-2/12">Kode Struk</th>
-                        <th class="border border-black w-4/12">Tanggal</th>
+                        <th class="border border-black w-4/12">Tanggal & Waktu</th>
                         <th class="w-4/12">Aksi</th>
                     </tr>
                 </thead>

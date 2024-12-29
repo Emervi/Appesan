@@ -85,6 +85,8 @@ class AuthController extends Controller
             session()->put('customer', $data);
             return redirect()->route('menu')->with('success', 'Anda berhasil login!');
         }
+
+        return redirect()->back()->with('fail', 'Email atau password salah!');
     }
 
     public function loginPegawai(Request $request)
@@ -133,6 +135,8 @@ class AuthController extends Controller
             session()->put('chef', $data);
             return redirect()->route('chef-dashboard')->with('success', 'Anda berhasil login!');
         }
+
+        return redirect()->back()->with('fail', 'Email atau password salah!');
     }
 
     public function logout()

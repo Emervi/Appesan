@@ -3,18 +3,18 @@
     {{-- Navbar Label --}}
     @if (session()->has('admin'))
         <a href="{{ route('admin-dashboard') }}">
-            <img src="{{ asset('images/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
+            <img src="{{ asset('images/assets/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
         </a>
     @elseif (session()->has('cashier'))
         <a href="{{ route('cashier-dashboard') }}">
-            <img src="{{ asset('images/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
+            <img src="{{ asset('images/assets/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
         </a>
     @elseif (session()->has('customer'))
         <a href="{{ route('menu') }}">
-            <img src="{{ asset('images/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
+            <img src="{{ asset('images/assets/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
         </a>
     @else
-        <img src="{{ asset('images/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
+        <img src="{{ asset('images/assets/Label Appesan.png') }}" alt="Label Appesan" class="w-40">
     @endif
 
     {{-- Navbar Button --}}

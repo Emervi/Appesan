@@ -27,18 +27,37 @@ class CustomerController extends Controller
 
 
     // MENU
-    public function menu()
+    public function menu(Request $request)
     {
 
         $customer_id = session('customer')['id'];
-        $menus = Menu::all();
+
+        $categories = Menu::distinct()->pluck('category');
+
+        $filter = $request->query('category');
+
+        if (empty($filter)) {
+            $menus = Menu::orderBy('status')->get();
+        } else {
+            $menus = Menu::where('category', $filter)
+            ->orderBy('status')
+            ->get();
+        }
+        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
+        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+
+        $mostOrderedFood = AdminController::getMostOrderedMenu('Makanan', $startOfMonth, $endOfMonth);
+        $mostOrderedBev = AdminController::getMostOrderedMenu('Minuman', $startOfMonth, $endOfMonth);
 
         $selectedMenu = Cart::where('customer_id', $customer_id)->pluck('menu_id')->toArray();
 
-        return view('customer.menu', [
-            'menus' => $menus,
-            'selectedMenu' => $selectedMenu,
-        ]);
+        return view('customer.menu', compact(
+            'menus', 
+            'categories',
+            'selectedMenu',
+            'mostOrderedFood',
+            'mostOrderedBev',
+        ));
     }
 
     public function detailMenu($menu_id)
@@ -46,9 +65,7 @@ class CustomerController extends Controller
 
         $menu = Menu::where('menu_id', $menu_id)->get();
 
-        return view('customer.detail-menu', [
-            'menu' => $menu,
-        ]);
+        return view('customer.detail-menu', compact('menu'));
     }
     // MENU \\
 
@@ -139,13 +156,15 @@ class CustomerController extends Controller
 
         $filter = $request->query('status');
 
-        if ($filter == 'all' || empty($filter)) {
-            $orders = Order::where('customer_id', $customer_id)
+        if (empty($filter)) {
+            $orders = Order::leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
+                ->where('orders.customer_id', $customer_id)
                 ->orderBy('status')
                 ->get();
         } else {
-            $orders = Order::where('customer_id', $customer_id)
-                ->where('status', $filter)
+            $orders = Order::leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
+                ->where('orders.customer_id', $customer_id)
+                ->where('orders.status', $filter)
                 ->get();
         }
 

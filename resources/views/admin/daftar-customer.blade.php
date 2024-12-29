@@ -2,6 +2,32 @@
 
     <div class="flex flex-col justify-center w-11/12">
         <div class="bg-mB w-full p-5 border-2 border-black rounded-tr-md rounded-tl-md flex relative">
+            <form action="" method="GET" class="flex gap-1 z-10">
+                @csrf
+
+                <div class="flex gap-1">
+                    <button type="submit"
+                        class="bg-mY py-1.5 px-2 border border-black rounded-md hover:text-white hover:bg-dY">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <input type="text" name="username" placeholder="Masukan username"
+                        class="p-2 rounded-md outline-none border border-black text-center">
+                </div>
+
+                {{-- tombol untuk mengembalikan pencarian seperti semula --}}
+                <a href="{{ route('admin.daftar-customer') }}"
+                    class="bg-lB py-2 px-2 border border-black rounded-md hover:text-white hover:bg-dB">
+                    <i class="fas fa-sync"></i>
+                </a>
+
+                {{-- <input type="text" name="nama" placeholder="Cari nama" class="rounded-md p-2 outline-none border border-black">
+                <a href="{{ route('admin.daftar-customer') }}" class="bg-lB p-2 border border-black rounded-md hover:bg-dB hover:text-white z-10">
+                    <i class="fas fa-magnifying-glass"></i>
+                </a>
+                <button type="submit" class="bg-mY py-1.5 px-2 border border-black rounded-md hover:bg-dY hover:text-white z-10">
+                    <i class="fas fa-magnifying-glass"></i>
+                </button> --}}
+            </form>
 
             <div class="absolute inset-0 flex items-center justify-center">
                 <h1 class="font-poppins text-4xl font-bold text-white">Daftar Pelanggan</h1>
@@ -57,6 +83,11 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if (empty($customers[0]->username))
+                        <tr>
+                            <td colspan="5" class="text-center font-bold text-xl p-3">Tidak ada pelanggan.</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
             <div class="mt-3">

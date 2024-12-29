@@ -5,11 +5,11 @@
         {{-- Header --}}
         <div
             class="bg-mY flex justify-between relative font-poppins p-2 border-2 border-b-0 border-black rounded-tl-lg rounded-tr-lg">
-            <a href="{{ route('pesanan-selesai') }}" class="z-20">
+            <a href="{{ route('pesanan-batal') }}" class="z-20">
                 <i class="fas fa-arrow-left text-3xl"></i>
             </a>
             <div class="absolute inset-0 flex justify-center items-center">
-                <h1 class="text-center text-2xl font-bold">Detail Pesanan Selesai</h1>
+                <h1 class="text-center text-2xl font-bold">Detail Pesanan Batal</h1>
             </div>
         </div>
 

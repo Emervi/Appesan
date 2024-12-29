@@ -15,18 +15,20 @@
 
             <div class="p-1 flex flex-col gap-1 h-96 max-h-96 overflow-y-auto">
                 @foreach ($order as $index => $data)
-                    <div class="bg-white border border-black rounded-md p-1 flex">
-                        <img src="{{ asset('images/' . $data->image) }}" alt="Foto menu"
-                            class="size-20 rounded-md object-cover">
-
-                        <div>
-                            <span>{{ $data->name }}</span>
-                            <span>{{ $data->quantity }}</span>
+                    <div
+                        class="bg-white border border-black rounded-md p-2 flex justify-between items-center hover:bg-gray-200">
+                        <div class="flex items-center gap-2">
+                            <img src="{{ asset('images/' . $data->image) }}" alt="Foto menu"
+                                class="size-20 rounded-md object-cover">
+                            <div class="flex flex-col">
+                                <span>{{ $data->name }}</span>
+                                <span>{{ $data->quantity }} x Rp {{ number_format($data->price, 0, ',', '.') }}</span>
+                            </div>
                         </div>
 
-                        <div>
+                        <div class="flex flex-col items-center font-semibold">
                             <span>Sub Total:</span>
-                            <span>{{ $data->sub_total }}</span>
+                            <span>Rp {{ number_format($data->sub_total, 0, ',', '.') }}</span>
                         </div>
                     </div>
                 @endforeach
@@ -37,13 +39,14 @@
                     @foreach ($order as $index => $data)
                         <div class="flex justify-between border-b border-gray-500 p-1">
                             <span>{{ $data->name }} x {{ $data->quantity }}</span>
-                            <span class="font-semibold">Rp. {{ number_format($data->sub_total, 0, ',', '.') }}</span>
+                            <span class="font-semibold">Rp {{ number_format($data->sub_total, 0, ',', '.') }}</span>
                         </div>
                     @endforeach
                 </div>
 
                 <div class="bg-yellow-500 row-span-1 border border-black p-1">
-                    <form action="{{ route('terima-transaksi') }}" method="POST" class="flex flex-col h-full justify-between">
+                    <form action="{{ route('terima-transaksi') }}" method="POST"
+                        class="flex flex-col h-full justify-between">
                         @csrf
 
                         <input type="hidden" name="total" value="{{ $total }}">
@@ -55,19 +58,18 @@
                         @endforeach
 
                         <div class="text-xl font-semibold">
-                            Total: Rp. {{ number_format($total, 0, ',', '.') }}
+                            Total: Rp {{ number_format($total, 0, ',', '.') }}
                         </div>
 
-                        <input type="number" name="uangPembayaran"
-                            class="w-full rounded border border-black outline-none p-1">
-
-                        <div class="flex justify-end">
+                        <div class="w-full flex flex-col gap-2">
+                            <input type="number" name="uangPembayaran"
+                                class="rounded border border-black outline-none p-1">
                             <button onclick="confirmData(event)"
-                                class="p-2 text-white w-1/2 border border-black rounded-md bg-green-600 hover:bg-green-800">
-                                <i class="fas fa-check"></i>
+                                class="p-2 text-white border border-black rounded-md bg-green-600 hover:bg-green-800">
                                 Bayar
                             </button>
                         </div>
+
                     </form>
                 </div>
             </div>

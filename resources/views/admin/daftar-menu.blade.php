@@ -7,8 +7,9 @@
             <form action="{{ route('admin.daftar-menu') }}" method="GET" class="z-10 font-roboto">
                 @csrf
 
-                <select name="category" onchange="this.form.submit()" class="bg-mY p-2 rounded-md border border-black text-center cursor-pointer">
-                    <option value="all">Semua Kategori</option>
+                <select name="category" onchange="this.form.submit()"
+                    class="bg-mY p-2 rounded-md border border-black text-center cursor-pointer">
+                    <option value="">Semua Kategori</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
                             {{ $category }}</option>
@@ -56,7 +57,7 @@
                                 </div>
                             </td>
                             <td>{{ $menu->name }}</td>
-                            <td>{{ $menu->formatted_price }}</td>
+                            <td>Rp {{ number_format($menu->price, 0, ',', '.') }}</td>
                             <td>{{ $menu->description }}</td>
                             <td>{{ $menu->category }}</td>
                             <td>{{ $menu->status }}</td>
@@ -81,6 +82,11 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if (empty($menus[0]))
+                        <tr>
+                            <td colspan="8" class="text-center font-bold text-xl p-3">Tidak ada menu.</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
             <div class="mt-3">

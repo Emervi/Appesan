@@ -8,7 +8,7 @@
 
                 <select name="status" onchange="this.form.submit()"
                     class="bg-mY w-1/2 p-2 text-center border-2 border-black font-poppins rounded-md">
-                    <option value="all">Semua Status</option>
+                    <option value="">Semua Status</option>
                     @foreach ($statuses as $status)
                         <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
                             {{ $status }}</option>
@@ -27,6 +27,10 @@
                 <div class="grid gap-4">
                     @foreach ($orders as $index => $order)
                         <div class="border border-black rounded-md bg-white p-4">
+                            <div class="flex justify-between text-sm font-semibold">
+                                <span>Atas Nama:</span>
+                                <span>{{ $order->username }}</span>
+                            </div>
                             <div class="flex justify-between text-sm font-semibold">
                                 <span>Kode Struk:</span>
                                 <span>{{ $order->receipt_code }}</span>

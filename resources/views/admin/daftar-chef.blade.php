@@ -62,6 +62,11 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if (empty($chefs[0]))
+                        <tr>
+                            <td colspan="5" class="text-center font-bold text-xl p-3">Tidak ada koki.</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
             <div class="mt-3">

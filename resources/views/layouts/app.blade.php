@@ -8,7 +8,7 @@
     <title>{{ $title }} | Appesan</title>
 
     {{-- Favicon Appesan --}}
-    <link rel="icon" href="{{ asset('images/appesan.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('images/assets/appesan.ico') }}" type="image/x-icon">
 
     {{-- Tailwind CSS --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -60,7 +60,8 @@
     <!-- Notifikasi Fail -->
     @if (session()->has('fail'))
         <div id="notification"
-            class="fixed top-4 right-4 z-40 bg-red-500 text-white px-6 py-3 border-2 border-black rounded-md shadow-lg opacity-0 transform scale-90 transition-all duration-300 ease-in-out">
+            class="fixed top-4 right-4 z-40 flex justify-center items-center gap-2 bg-red-500 text-white p-3 border border-black rounded-md shadow-lg opacity-0 transform scale-90 transition-all duration-300 ease-in-out">
+            <i class="fas fa-times"></i>
             <p class="font-semibold">{{ session('fail') }}</p>
         </div>
     @endif

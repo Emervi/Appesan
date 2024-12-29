@@ -26,7 +26,7 @@
                         </div>
                         <div class="font-medium">
                             <h3>Sub Total:</h3>
-                            <p>Rp. {{ number_format($data->sub_total, 0, ',', '.') }}</p>
+                            <p>Rp {{ number_format($data->sub_total, 0, ',', '.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
             <h3>{{ $order[0]->receipt_code }}</h3>
             <div class="flex justify-between">
                 <h3>Total Harga Pesanan:</h3>
-                <p>Rp. {{ number_format($totalPrice, 0, ',', '.') }}</p>
+                <p>Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
             </div>
         </div>
 

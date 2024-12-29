@@ -117,7 +117,7 @@
                 <span>{{ $order->name }}</span>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span>{{ $order->quantity }} x {{ number_format($order->price, 0, ',', '.') }}</span>
-                    <span style="margin-left: 100px">Rp. {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                    <span style="float: right">Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
                 </div>
             </div>
         @endforeach
@@ -125,11 +125,11 @@
         {{-- <span>=============================</span> --}}
         <span>---------------------------------------------------</span>
         <footer class="nominals">
-            <p>Total: Rp. {{ number_format($totalPrice, 0, ',', '.') }}</p>
+            <p>Total: Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
             <p>Uang Pembayaran: <br>
-                Rp. {{ number_format($payment, 0, ',', '.') }}
+                Rp {{ number_format($payment, 0, ',', '.') }}
             </p>
-            <p>Kembalian: Rp. {{ number_format($change, 0, ',', '.') }}</p>
+            <p>Kembalian: Rp {{ number_format($change, 0, ',', '.') }}</p>
         </footer>
     </div>
 

@@ -25,8 +25,8 @@ class MenuRequest extends FormRequest
     {
         return [
             'image' => ['required', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
-            'name' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'name' => ['required', 'regex:/^[a-zA-Z\s]+$/'],
+            'price' => ['required', 'numeric', 'min:1'],
             'description' => ['required', 'string'],
             'category' => ['required'],
             'status' => ['required'],
@@ -47,11 +47,11 @@ class MenuRequest extends FormRequest
             'image.max' => 'Gambar tidak boleh lebih dari 2MB.',
             
             'name.required' => 'Nama menu harus diisi.',
-            'name.string' => 'Nama menu harus berupa teks.',
+            'name.regex' => 'Nama menu hanya boleh mengandung huruf dan spasi.',
             
             'price.required' => 'Harga harus diisi.',
             'price.numeric' => 'Harga harus berupa angka.',
-            'price.min' => 'Harga tidak boleh kurang dari 0.',
+            'price.min' => 'Harga tidak boleh kurang dari 1.',
             
             'description.required' => 'Deskripsi harus diisi.',
             'description.string' => 'Deskripsi harus berupa teks.',

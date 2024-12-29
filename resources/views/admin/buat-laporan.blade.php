@@ -39,7 +39,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            @foreach ($transactions as $index => $transaction)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $transaction->transaction_date }}</td>
+                    <td>Rp {{ number_format($transaction->income, 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+            {{-- <tr>
                 <td>1</td>
                 <td>20-12-2024</td>
                 <td>Rp. 520.000</td>
@@ -63,9 +70,9 @@
                 <td>5</td>
                 <td>21-12-2024</td>
                 <td>Rp. 230.000</td>
-            </tr>
+            </tr> --}}
             <tr>
-                <td colspan="3">Total Pendapatan: Rp. 2.000.000</td>
+                <td colspan="3">Total Pendapatan: Rp {{ number_format($totalIncome, 0, ',', '.') }}</td>
             </tr>
             {{-- @foreach ($data as $index => $item)
                 <tr>

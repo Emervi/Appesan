@@ -99,8 +99,10 @@ Route::middleware('cekRoleCustomer')->group(function () {
 // HALAMAN CHEF
 Route::prefix('chef')->middleware('cekRolePegawai:chef')->group(function () {
 
+    // dashboard chef
     Route::get('/dashboard', [ChefController::class, 'dashboard'])->name('chef-dashboard');
 
+    // selesaikan menu pesanan
     Route::put('/selesaikan-menu/{order_id}/{menu_id}', [ChefController::class, 'selesaikanMenu'])->name('selesaikan-menu');
 });
 
@@ -109,6 +111,7 @@ Route::prefix('chef')->middleware('cekRolePegawai:chef')->group(function () {
 // HALAMAN CASHIER
 Route::prefix('cashier')->middleware('cekRolePegawai:cashier')->group(function () {
 
+    // dashboard cashier
     Route::get('/dashboard', [CashierController::class, 'dashboard'])->name('cashier-dashboard');
 
 
@@ -116,10 +119,13 @@ Route::prefix('cashier')->middleware('cekRolePegawai:cashier')->group(function (
     // tampilan pesanan masuk
     Route::get('/pesanan-masuk', [CashierController::class, 'pesananMasuk'])->name('pesanan-masuk');
 
+    // detail pesanan masuk
     Route::get('/pesanan-masuk/detail/{order_id}', [CashierController::class, 'detailPesananMasuk'])->name('detail-pesanan-masuk');
 
+    // batalkan pesanan masuk
     Route::delete('/pesanan-masuk/hapus/{order_id}', [CashierController::class, 'hapusPesananMasuk'])->name('hapus-pesanan-masuk');
 
+    // konfirmasi pesanan masuk
     Route::put('/pesanan-masuk/konfirmasi/{order_id}', [CashierController::class, 'konfirmasiPesananMasuk'])->name('konfirmasi-pesanan-masuk');
 
 
@@ -136,7 +142,7 @@ Route::prefix('cashier')->middleware('cekRolePegawai:cashier')->group(function (
     // tampilan bayar selesai
     Route::get('/bayar-selesai/{order_id}/{payment}', [CashierController::class, 'bayarSelesai'])->name('bayar-selesai');
 
-    // tampilan bayar pesanan
+    // struk pembayaran
     Route::get('/struk-pembayaran/{order_id}/{payment}', [CashierController::class, 'strukPembayaran'])->name('struk-pembayaran');
 
 
@@ -146,6 +152,14 @@ Route::prefix('cashier')->middleware('cekRolePegawai:cashier')->group(function (
 
     // detail pesanan selesai
     Route::get('/pesanan-selesai/detail/{order_id}', [CashierController::class, 'detailPesananSelesai'])->name('detail-pesanan-selesai');
+
+
+
+    // tampilan pesanan batal
+    Route::get('/pesanan-batal', [CashierController::class, 'pesananBatal'])->name('pesanan-batal');
+
+    // detail pesanan batal
+    Route::get('/pesanan-batal/detail/{order_id}', [CashierController::class, 'detailPesananBatal'])->name('detail-pesanan-batal');
 });
 
 
@@ -247,27 +261,3 @@ Route::prefix('admin')->middleware('cekRolePegawai:admin')->group(function () {
     // laporan keuangan
     Route::post('/laporan-keuangan', [AdminController::class, 'laporanKeuangan'])->name('laporan-keuangan');
 });
-
-
-
-// // GUEST
-// Route::middleware('cek_session_null')->group(function () {
-
-//     // landing page
-//     Route::get('/', function () {
-//         return view('home');
-//     })->name('landingPage');
-//     // \landing page
-
-//     // LOGIN
-//     Route::get('/login', [LoginController::class, 'tampilLogin'])->name('auth.login');
-//     Route::post('/login', [LoginController::class, 'login']);
-//     // \LOGIN
-
-//     // REGISTER
-//     Route::get('/register', [RegisterController::class, 'halamanRegister'])->name('auth.register');
-//     Route::post('/register', [RegisterController::class, 'storeRegister']);
-//     // \REGISTER
-
-// });
-// // \GUEST

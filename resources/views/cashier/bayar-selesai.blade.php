@@ -13,18 +13,18 @@
                 <div class="flex justify-between items-center p-1 border-b border-black">
                     <div class="flex flex-col">
                         <span>{{ $order->name }}</span>
-                        <span>{{ $order->quantity }} x Rp. {{ number_format($order->price, 0, ',', '.') }}</span>
+                        <span>{{ $order->quantity }} x Rp {{ number_format($order->price, 0, ',', '.') }}</span>
                     </div>
-                    <span>Rp. {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                    <span>Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
                 </div>
             @endforeach
         </div>
 
         <div>
             <div class="font-semibold flex flex-col">
-                <span>Total: Rp. {{ number_format($totalPrice, 0, ',', '.') }}</span>
-                <span>Uang Pembayaran: Rp. {{ number_format($payment, 0, ',', '.') }}</span>
-                <span>Kembalian: Rp. {{ number_format($change, 0, ',', '.') }}</span>
+                <span>Total: Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                <span>Uang Pembayaran: Rp {{ number_format($payment, 0, ',', '.') }}</span>
+                <span>Kembalian: Rp {{ number_format($change, 0, ',', '.') }}</span>
             </div>
             <span>==============================================</span>
         </div>

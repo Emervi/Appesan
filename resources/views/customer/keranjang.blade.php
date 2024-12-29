@@ -11,15 +11,15 @@
                     <div class="p-1.5 flex items-center gap-2 bg-white border border-black rounded-md shadow-md mb-3">
 
                         <div>
-                            <img src="{{ asset('images/' . $cart->image) }}" alt="Foto menu" class="size-20 rounded">
+                            <img src="{{ asset('images/' . $cart->image) }}" alt="Foto menu" class="size-20 rounded object-cover">
                         </div>
 
                         <div class="flex flex-col flex-1">
                             <p class="text-xl">{{ $cart->name }}</p>
-                            <p class="font-bold mb-3">{{ $cart->formatted_price }}</p>
+                            <p class="font-bold mb-3">Rp {{ number_format($cart->price, 0, ',', '.') }}</p>
                             <div class="flex flex-col">
                                 <p>Subtotal:</p>
-                                <p>Rp. {{ number_format($cart->price * $cart->quantity, 0, ',', '.') }}</p>
+                                <p>Rp {{ number_format($cart->price * $cart->quantity, 0, ',', '.') }}</p>
                             </div>
                         </div>
 
@@ -73,7 +73,7 @@
         </div>
 
         @if ($carts->isNotEmpty())
-        <p class="text-3xl mb-5 font-semibold">Total: Rp. {{ number_format($carts->sum('total'), 0, ',', '.') }}</p>
+        <p class="text-3xl mb-5 font-semibold">Total: Rp {{ number_format($carts->sum('total'), 0, ',', '.') }}</p>
 
         <form action="{{ route('tambah-pesanan') }}" method="POST">
             @csrf

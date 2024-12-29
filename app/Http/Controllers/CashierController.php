@@ -24,11 +24,14 @@ class CashierController extends Controller
 
         $completeOrder = Order::where('status', 'Selesai')->count();
 
+        $canceledOrder = Order::where('status', 'Dibatalkan')->count();
+
         return view('cashier.dashboard', compact(
             'name',
             'unconfirmedOrder',
             'waitingOrder',
-            'completeOrder'
+            'completeOrder',
+            'canceledOrder',
         ));
     }
 
@@ -237,12 +240,18 @@ class CashierController extends Controller
             200,
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="Laporan Transaksi.pdf"',
+                'Content-Disposition' => 'inline; filename="Struk Pembayaran.pdf"',
             ]
         );
 
-        // return view('cashier.struk');
-
+        // return view('cashier.struk', compact(
+        //     'cashier_name', 
+        //     'orders', 
+        //     'totalPrice', 
+        //     'payment', 
+        //     'change',
+        //     'printDate',
+        // ));
     }
 
     public function pesananSelesai()
@@ -267,6 +276,33 @@ class CashierController extends Controller
             ->sum('sub_total');
 
         return view('cashier.detail-pesanan-selesai', [
+            'order' => $ordersDetail,
+            'totalPrice' => $totalPrice,
+        ]);
+    }
+
+    public function pesananBatal()
+    {
+        $canceledOrders = Order::leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
+        ->where('status', 'Dibatalkan')
+        ->get();
+
+        return view('cashier.pesanan-batal', compact('canceledOrders'));
+    }
+
+    public function detailPesananBatal($order_id)
+    {
+
+        $ordersDetail = OrderDetail::leftJoin('menus', 'menus.menu_id', '=', 'detail_orders.menu_id')
+            ->leftJoin('orders', 'orders.order_id', '=', 'detail_orders.order_id')
+            ->select('detail_orders.*', 'menus.name', 'menus.image', 'orders.receipt_code')
+            ->where('detail_orders.order_id', $order_id)
+            ->get();
+
+        $totalPrice = OrderDetail::where('order_id', $order_id)
+            ->sum('sub_total');
+
+        return view('cashier.detail-pesanan-batal', [
             'order' => $ordersDetail,
             'totalPrice' => $totalPrice,
         ]);

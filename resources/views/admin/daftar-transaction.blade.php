@@ -9,7 +9,6 @@
                 {{-- form laporan transaksi --}}
                 <form action="{{ route('laporan-keuangan') }}" method="POST" id="pdfForm" target="_blank">
                     @csrf
-
                     <div class="flex justify-end align-middle">
                         <button type="button" @click="isOpenLaporan = false">
                             <i class="fas fa-times text-2xl cursor-pointer"></i>
@@ -22,11 +21,9 @@
                         <label class="font-semibold">Masukan Tanggal Transaksi: </label>
 
                         <div class="grid grid-cols-3 mt-3">
-
                             <div>
-                                <input type="date" name="tanggalAwal" id="tanggalAwal"
-                                    value="{{ old('tanggalAwal') }}" oninput="handleInputTanggal()"
-                                    class="bg-gray-200 p-2 rounded mb-1">
+                                <input type="date" name="startDate" id="startDate" value="{{ old('startDate') }}"
+                                    oninput="handleInputTanggal()" class="bg-gray-200 p-2 rounded mb-1">
                             </div>
 
                             <div class="flex justify-center">
@@ -34,15 +31,11 @@
                             </div>
 
                             <div>
-                                <input type="date" name="tanggalAkhir" id="tanggalAkhir"
-                                    oninput="handleInputTanggal()" value="{{ old('tanggalAkhir') }}"
-                                    class="bg-gray-200 p-2 rounded mb-1">
+                                <input type="date" name="endDate" id="endDate" value="{{ old('endDate') }}"
+                                    oninput="handleInputTanggal()" class="bg-gray-200 p-2 rounded mb-1">
                             </div>
-
                         </div>
-
                         <p class="text-red-500 text-sm font-bold mt-2" id="pesanError"></p>
-
                     </div>
 
                     <div class="flex justify-end space-x-4">
@@ -51,7 +44,6 @@
                             Laporan</button>
                     </div>
                 </form>
-
             </div>
         </div>
 
@@ -61,12 +53,18 @@
                 <h1 class="font-poppins text-4xl font-bold text-white">Daftar Transaksi</h1>
             </div>
 
-            {{-- Tombol tambah --}}
+            {{-- Tombol buat laporan --}}
+            @if (!empty($transactions[0]))
             <button @click="isOpenLaporan = true"
                 class="bg-green-600 p-2 border border-black text-white rounded-md hover:bg-green-700 ml-auto z-10">
                 <i class="fas fa-file mr-2"></i>
                 Buat Laporan
             </button>
+            @else
+            <div class="p-2 opacity-0">
+                Invisiba box
+            </div>
+            @endif
         </div>
 
         <div
@@ -86,10 +84,11 @@
                 <tbody>
                     @foreach ($transactions as $index => $transaction)
                         <tr class="odd:bg-gray-200 hover:bg-gray-300 text-center">
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ $offset + $index + 1 }}</td>
                             <td class="px-2">{{ $transaction->name }}</td>
-                            <td class="px-2">{{ $transaction->transaction_date }}</td>
-                            <td class="px-2">Rp. {{ number_format($transaction->income, 0, ',', '.') }}</td>
+                            <td class="px-2">{{ $transaction_date[$index] }}</td>
+                            <td class="px-2 font-semibold">Rp {{ number_format($transaction->income, 0, ',', '.') }}
+                            </td>
                             <td class="p-2 flex gap-2 justify-evenly">
                                 <form action="{{ route('admin.detail-transaksi', [$transaction->transaction_id]) }}"
                                     method="GET">
@@ -103,31 +102,43 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if (empty($transactions[0]))
+                        <tr>
+                            <td colspan="5" class="text-center font-bold text-xl p-3">Tidak ada transaksi.</td>
+                        </tr>
+                    @endif
                 </tbody>
-
             </table>
+            <div class="mt-3">
+                @if ($offset > -1)
+                    {{-- pagination --}}
+                    {{ $transactions->links() }}
+                @endif
+            </div>
         </div>
     </div>
 
     <script>
         function handleInputTanggal() {
             // Ambil nilai tanggal dari inputan
-            tanggalAwal = document.getElementById('tanggalAwal').value;
-            tanggalAkhir = document.getElementById('tanggalAkhir').value;
+            startDate = document.getElementById('startDate').value;
+            endDate = document.getElementById('endDate').value;
 
             // Jika kedua tanggal sudah diisi, lakukan perbandingan
-            if (tanggalAwal && tanggalAkhir) {
+            if (startDate && endDate) {
                 // Bandingkan tanggal
-                if (new Date(tanggalAwal) > new Date(tanggalAkhir)) {
+                if (new Date(startDate) > new Date(endDate)) {
                     document.getElementById('btnsub').disabled = true;
-                    document.getElementById('pesanError').textContent = "Tanggal awal tidak boleh lebih besar dari tanggal akhir!";
+                    document.getElementById('pesanError').textContent =
+                        "Tanggal awal tidak boleh lebih besar dari tanggal akhir!";
                 } else {
                     document.getElementById('btnsub').disabled = false;
                     document.getElementById('pesanError').textContent = "";
                 }
             } else {
                 document.getElementById('btnsub').disabled = true;
-                document.getElementById('pesanError').textContent = "Seluruh kolom tanggal harus diisi!"; // Reset jika input kosong
+                document.getElementById('pesanError').textContent =
+                    "Seluruh kolom tanggal harus diisi!"; // Reset jika input kosong
             }
         }
     </script>
