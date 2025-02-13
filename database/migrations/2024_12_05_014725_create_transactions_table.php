@@ -15,11 +15,13 @@ class CreateTransactionsTable extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id('transaction_id');
+            $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('cashier_id');
-            $table->dateTime('transaction_date');
+            $table->date('transaction_date');
             $table->float('income');
             $table->timestamps();
 
+            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
             $table->foreign('cashier_id')->references('cashier_id')->on('cashiers')->onDelete('cascade');
         });
     }

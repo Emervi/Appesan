@@ -43,6 +43,7 @@ Route::middleware('cekNullRole')->group(function () {
 
     // REGISTER
     Route::get('/register', [AuthController::class, 'tampilanRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
 
     // LOGIN
     Route::get('/login', [AuthController::class, 'tampilanLogin'])->name('login');

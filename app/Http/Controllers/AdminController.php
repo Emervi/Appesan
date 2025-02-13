@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -49,7 +50,7 @@ class AdminController extends Controller
             ->sum('income');
 
         $todayMenus = OrderDetail::leftJoin('orders', 'orders.order_id', '=', 'detail_orders.order_id')
-            ->where('detail_orders.status', 'Disajikan')
+            ->where('detail_orders.status', 'Selesai')
             ->whereDate('orders.order_date', Carbon::today())
             ->count();
 
@@ -543,35 +544,42 @@ class AdminController extends Controller
             return redirect()->back()->with('fail', 'Tanggal awal tidak boleh lebih besar dari tanggal akhir');
         }
 
-        $query = Transaction::whereBetween('transaction_date', [$startDate, $endDate]);
+        $totalIncome = Transaction::whereBetween('transaction_date', [$startDate, $endDate])->sum('income');
 
-        $totalIncome = $query->sum('income');
-        $transactions = $query->orderBy('transaction_date', 'asc')->get();
-
+        $transactions = Transaction::select('transaction_date', DB::raw('SUM(income) as total_pendapatan'))
+        ->groupBy('transaction_date')
+        ->get();
+        
         // Set opsi DomPDF
         $options = new Options();
         $options->set('defaultFont', 'Courier');
         $dompdf = new Dompdf($options);
 
+        $displayStartDate = $startDate->format('Y-m-d');
+        $displayEndDate = $endDate->format('Y-m-d');
+
         // Render HTML ke PDF
         $html = view('admin.buat-laporan', compact(
             'transactions',
             'totalIncome',
+            'displayStartDate',
+            'displayEndDate',
         ))->render();
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // Menambahkan nomor halaman
+        // menambahkan nomor halaman
         $canvas = $dompdf->getCanvas();
+        $fontMetrics = $dompdf->getFontMetrics();
         $pageCount = $dompdf->getCanvas()->get_page_count();
 
         for ($i = 1; $i <= $pageCount; $i++) {
-            $canvas->page_script(function ($pageNumber, $canvas, $fontMetrics) {
+            $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
                 $text = "$pageNumber";
                 $width = $fontMetrics->getTextWidth($text, 'Courier', 12);
-                $canvas->text(560 - $width, 815, $text, null, 12);
+                $canvas->text(560 - $width, 815, $text, null, 12); // Ubah posisi x dan y sesuai kebutuhan
             });
         }
 
@@ -586,7 +594,7 @@ class AdminController extends Controller
             200,
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="Laporan Transaksi.pdf"',
+                'Content-Disposition' => 'inline; filename="Laporan Keuangan.pdf"',
             ]
         );
     }
@@ -596,100 +604,100 @@ class AdminController extends Controller
 
 
     // CRUD ADMIN ====================================================================================================
-    public function daftarAdmin()
-    {
+    // public function daftarAdmin()
+    // {
 
-        $perPage = 10;
+    //     $perPage = 10;
 
-        $admins = Admin::latest()->paginate($perPage);
+    //     $admins = Admin::latest()->paginate($perPage);
 
-        $currentPage = $admins->currentPage();
-        $offset = ($currentPage - 1) * $perPage;
+    //     $currentPage = $admins->currentPage();
+    //     $offset = ($currentPage - 1) * $perPage;
 
-        return view('admin.daftar-admin', compact('admins', 'offset'));
-    }
+    //     return view('admin.daftar-admin', compact('admins', 'offset'));
+    // }
 
-    public function tambahAdmin()
-    {
+    // public function tambahAdmin()
+    // {
 
-        return view('admin.tambah-admin');
-    }
+    //     return view('admin.tambah-admin');
+    // }
 
-    public function simpanAdmin(Request $request)
-    {
+    // public function simpanAdmin(Request $request)
+    // {
 
-        $request->validate([
-            'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:admins,email'],
-            'password' => ['required', 'min:8'],
-            'address' => ['required', 'string'],
-        ], [
-            'name.required' => 'Nama wajib diisi.',
-            'name.string' => 'Nama wajib terdiri dari huruf.',
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email salah.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 8 karakter.',
-            'address.required' => 'Alamat wajib diisi.',
-            'address.string' => 'Alamat wajib terdiri dari huruf.',
-        ]);
+    //     $request->validate([
+    //         'name' => ['required', 'string'],
+    //         'email' => ['required', 'email', 'unique:admins,email'],
+    //         'password' => ['required', 'min:8'],
+    //         'address' => ['required', 'string'],
+    //     ], [
+    //         'name.required' => 'Nama wajib diisi.',
+    //         'name.string' => 'Nama wajib terdiri dari huruf.',
+    //         'email.required' => 'Email wajib diisi.',
+    //         'email.email' => 'Format email salah.',
+    //         'email.unique' => 'Email sudah terdaftar.',
+    //         'password.required' => 'Password wajib diisi.',
+    //         'password.min' => 'Password minimal 8 karakter.',
+    //         'address.required' => 'Alamat wajib diisi.',
+    //         'address.string' => 'Alamat wajib terdiri dari huruf.',
+    //     ]);
 
-        Admin::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'address' => $request->address,
-        ]);
+    //     Admin::create([
+    //         'name' => $request->name,
+    //         'email' => $request->email,
+    //         'password' => Hash::make($request->password),
+    //         'address' => $request->address,
+    //     ]);
 
-        return redirect()->route('admin.daftar-admin')->with('success', 'Admin berhasil dibuat!');
-    }
+    //     return redirect()->route('admin.daftar-admin')->with('success', 'Admin berhasil dibuat!');
+    // }
 
-    public function ubahAdmin($admin_id)
-    {
+    // public function ubahAdmin($admin_id)
+    // {
 
-        $admin = Admin::where('admin_id', $admin_id)->get();
+    //     $admin = Admin::where('admin_id', $admin_id)->get();
 
-        return view('admin.ubah-admin', compact('admin'));
-    }
+    //     return view('admin.ubah-admin', compact('admin'));
+    // }
 
-    public function updateAdmin(Request $request, $admin_id)
-    {
+    // public function updateAdmin(Request $request, $admin_id)
+    // {
 
-        $request->validate([
-            'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:admins,email,' . $admin_id . ',admin_id'],
-            'address' => ['required', 'string'],
-            // 'password' => ['required', 'min:8'],
-        ], [
-            'name.required' => 'Nama wajib diisi.',
-            'name.string' => 'Nama wajib terdiri dari huruf.',
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email salah.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'address.required' => 'Alamat wajib diisi.',
-            'address.string' => 'Alamat wajib terdiri dari huruf.',
-            // 'password.required' => 'Password wajib diisi.',
-            // 'password.min' => 'Password minimal 8 karakter.',
-        ]);
+    //     $request->validate([
+    //         'name' => ['required', 'string'],
+    //         'email' => ['required', 'email', 'unique:admins,email,' . $admin_id . ',admin_id'],
+    //         'address' => ['required', 'string'],
+    //         // 'password' => ['required', 'min:8'],
+    //     ], [
+    //         'name.required' => 'Nama wajib diisi.',
+    //         'name.string' => 'Nama wajib terdiri dari huruf.',
+    //         'email.required' => 'Email wajib diisi.',
+    //         'email.email' => 'Format email salah.',
+    //         'email.unique' => 'Email sudah terdaftar.',
+    //         'address.required' => 'Alamat wajib diisi.',
+    //         'address.string' => 'Alamat wajib terdiri dari huruf.',
+    //         // 'password.required' => 'Password wajib diisi.',
+    //         // 'password.min' => 'Password minimal 8 karakter.',
+    //     ]);
 
-        Admin::where('admin_id', $admin_id)->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'address' => $request->address,
-            // 'password' => Hash::make($request->password),
-        ]);
+    //     Admin::where('admin_id', $admin_id)->update([
+    //         'name' => $request->name,
+    //         'email' => $request->email,
+    //         'address' => $request->address,
+    //         // 'password' => Hash::make($request->password),
+    //     ]);
 
-        return redirect()->route('admin.daftar-admin')->with('success', 'Admin berhasil diubah!');
-    }
+    //     return redirect()->route('admin.daftar-admin')->with('success', 'Admin berhasil diubah!');
+    // }
 
-    public function hapusAdmin($admin_id)
-    {
+    // public function hapusAdmin($admin_id)
+    // {
 
-        Admin::where('admin_id', $admin_id)
-            ->delete();
+    //     Admin::where('admin_id', $admin_id)
+    //         ->delete();
 
-        return redirect()->back()->with('success', 'Admin berhasil dihapus!');
-    }
+    //     return redirect()->back()->with('success', 'Admin berhasil dihapus!');
+    // }
     // CRUD ADMIN \\
 }

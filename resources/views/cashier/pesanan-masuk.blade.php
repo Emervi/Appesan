@@ -35,7 +35,7 @@
                             <td class="px-2 border border-black">{{ $order->order_date }}</td>
                             <td class="p-2 flex gap-2 justify-evenly">
 
-                                <form action="{{ route('hapus-pesanan-masuk', [$order->order_id]) }}" method="POST">
+                                {{-- <form action="{{ route('hapus-pesanan-masuk', [$order->order_id]) }}" method="POST">
                                     @csrf
                                     @method('delete')
 
@@ -45,7 +45,7 @@
                                         <i class="fas fa-times"></i>
                                         Batalkan
                                     </button>
-                                </form>
+                                </form> --}}
 
                                 <a href="{{ route('detail-pesanan-masuk', [$order->order_id]) }}"
                                     class="bg-yellow-400 p-1.5 rounded border border-black hover:bg-yellow-600">

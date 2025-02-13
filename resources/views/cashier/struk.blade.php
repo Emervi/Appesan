@@ -99,7 +99,8 @@
 
 <body>
 
-    <div>
+    {{-- V1 --}}
+    {{-- <div>
         <header>
             <p>Terima Kasih Sudah Memesan Menu Menggunakan Aplikasi</p>
             <h2>Appesan</h2>
@@ -122,7 +123,6 @@
             </div>
         @endforeach
 
-        {{-- <span>=============================</span> --}}
         <span>---------------------------------------------------</span>
         <footer class="nominals">
             <p>Total: Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
@@ -130,6 +130,43 @@
                 Rp {{ number_format($payment, 0, ',', '.') }}
             </p>
             <p>Kembalian: Rp {{ number_format($change, 0, ',', '.') }}</p>
+        </footer>
+    </div> --}}
+
+    <div>
+        <div style="text-align: left">
+            <span><b>{{ $receipt_code }}</b></span>
+            <br>
+            <span>Kasir: {{ $cashier_name }}</span>
+            <br>
+            <span>Atas Nama: {{ $customer_name }}</span>
+            <br>
+            <span>{{ $printDate }}</span>
+        </div>
+        <span>---------------------------------------------------</span>
+
+        @foreach ($orders as $order)
+            <div class="menuList">
+                <span>{{ $order->name }}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>{{ $order->quantity }} x {{ number_format($order->price, 0, ',', '.') }}</span>
+                    <span style="float: right">Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                </div>
+            </div>
+        @endforeach
+
+        <span>---------------------------------------------------</span>
+        <footer class="nominals">
+            <p>Total: Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
+            <p>Uang Pembayaran: <br>
+                Rp {{ number_format($payment, 0, ',', '.') }}
+            </p>
+            <p>Kembalian: Rp {{ number_format($change, 0, ',', '.') }}</p>
+        </footer>
+        <span>---------------------------------------------------</span>
+        <footer>
+            <p>Terima Kasih Sudah Memesan Menu Menggunakan Aplikasi</p>
+            <h2>Appesan</h2>
         </footer>
     </div>
 

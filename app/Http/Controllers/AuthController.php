@@ -34,15 +34,15 @@ class AuthController extends Controller
     {
 
         $request->validate([
-            'name' => ['required', 'string'],
-            'username' => ['required', 'string', 'min:3'],
+            'name' => ['required', 'regex:/^[a-zA-Z\s]+$/'],
+            'username' => ['required', 'regex:/^[a-zA-Z\s]+$/', 'min:3'],
             'email' => ['required', 'email', 'unique:customers,email'],
             'password' => ['required', 'min:8'],
         ], [
             'name.required' => 'Nama wajib diisi.',
-            'name.string' => 'Nama wajib berupa teks.',
+            'name.regex' => 'Nama hanya boleh mengandung huruf dan spasi.',
             'username.required' => 'Username wajib diisi.',
-            'username.string' => 'Username wajib berupa teks.',
+            'username.regex' => 'Username hanya boleh mengandung huruf dan spasi.',
             'username.min' => 'Username minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
@@ -51,12 +51,18 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 8 karakter.',
         ]);
 
-        Customer::create([
+        $customer = Customer::create([
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $data = [
+            'id' => $customer->customer_id,
+            'username' => $customer->username,
+        ];
+        session()->put('customer', $data);
 
         return redirect()->route('menu')->with('success', 'Akun berhasil dibuat!');
     }
@@ -65,11 +71,11 @@ class AuthController extends Controller
     {
 
         $request->validate([
-            'username' => ['required', 'string'],
+            'username' => ['required', 'regex:/^[a-zA-Z\s]+$/'],
             'password' => ['required', 'min:8'],
         ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.string' => 'Username wajib berupa teks.',
+            'username.required' => 'Username wajib diisi.',
+            'username.regex' => 'Username hanya boleh mengandung huruf dan spasi.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
         ]);

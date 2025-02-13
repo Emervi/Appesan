@@ -13,6 +13,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'cashier_id',
+        'order_id',
         'transaction_date',
         'income'
     ];

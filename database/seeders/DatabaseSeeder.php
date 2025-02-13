@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
             'address' => 'Jl. Python',
         ]);
-        \App\Models\Chef::factory()->count(10)->create();
+        // \App\Models\Chef::factory()->count(10)->create();
 
         \App\Models\Cashier::create([
             'name' => 'Jon',
@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
             'address' => 'Jl. Bikin Botom',
         ]);
-        \App\Models\Cashier::factory()->count(10)->create();
+        // \App\Models\Cashier::factory()->count(10)->create();
 
         \App\Models\Customer::create([
             'name' => 'Kepin Donald',

@@ -35,7 +35,7 @@
                             <td class="border border-black font-semibold">{{ $order->receipt_code }}</td>
                             <td class="border border-black">{{ $order->order_date }}</td>
                             <td class="p-2">
-                                <a href="{{ route('detail-pesanan-selesai', [$order->order_id]) }}"
+                                <a href="{{ route('detail-pesanan-selesai', [$order->order_id]) }}" target="_blank"
                                     class="bg-yellow-400 p-1.5 rounded border border-black hover:bg-yellow-600">
                                     <i class="fas fa-info-circle"></i>
                                     Detail

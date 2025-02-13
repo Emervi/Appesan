@@ -129,12 +129,19 @@ class CashierController extends Controller
         }
 
         $cashier_id = session('cashier')['id'];
+
         Order::where('order_id', $request->order_id)
             ->update([
                 'status' => 'Selesai'
             ]);
 
+        OrderDetail::where('order_id', $request->order_id)
+            ->update([
+                'status' => 'Selesai'
+            ]);
+            
         $transaction = Transaction::create([
+            'order_id' => $request->order_id,
             'cashier_id' => $cashier_id,
             'transaction_date' => now(),
             'income' => $request->total,
@@ -170,10 +177,10 @@ class CashierController extends Controller
         $change = $payment - $totalPrice;
 
         return view('cashier.bayar-selesai', compact(
-            'orders', 
-            'totalPrice', 
-            'payment', 
-            'change', 
+            'orders',
+            'totalPrice',
+            'payment',
+            'change',
             'order_id'
         ));
     }
@@ -182,6 +189,13 @@ class CashierController extends Controller
     {
 
         $cashier_name = session('cashier')['name'];
+
+        $receipt_code = Order::where('order_id', $order_id)
+        ->first()->receipt_code;
+
+        $customer_name = Order::leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
+        ->where('order_id', $order_id)
+        ->first()->username;
 
         $orders = OrderDetail::leftJoin('menus', 'menus.menu_id', '=', 'detail_orders.menu_id')
             ->select('detail_orders.*', 'menus.name', 'menus.price')
@@ -202,13 +216,15 @@ class CashierController extends Controller
 
         // Render HTML ke PDF
         $html = view('cashier.struk', compact(
-            'cashier_name', 
-            'orders', 
-            'totalPrice', 
-            'payment', 
+            'cashier_name',
+            'receipt_code',
+            'customer_name',
+            'orders',
+            'totalPrice',
+            'payment',
             'change',
             'printDate',
-            ))->render();
+        ))->render();
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper([0, 0, 226.8, 652.05], 'portrait'); // L = 8cm, P = 23cm
@@ -257,8 +273,8 @@ class CashierController extends Controller
     public function pesananSelesai()
     {
         $doneOrders = Order::leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
-        ->where('status', 'Selesai')
-        ->get();
+            ->where('status', 'Selesai')
+            ->get();
 
         return view('cashier.pesanan-selesai', compact('doneOrders'));
     }
@@ -284,8 +300,8 @@ class CashierController extends Controller
     public function pesananBatal()
     {
         $canceledOrders = Order::leftJoin('customers', 'customers.customer_id', '=', 'orders.customer_id')
-        ->where('status', 'Dibatalkan')
-        ->get();
+            ->where('status', 'Dibatalkan')
+            ->get();
 
         return view('cashier.pesanan-batal', compact('canceledOrders'));
     }
